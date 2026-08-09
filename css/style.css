@@ -475,10 +475,7 @@ textarea:focus-visible,
   box-shadow: var(--shadow-md);
   overflow: hidden;
   margin-top: var(--sp-6);
-}
-.ledger:not([hidden]) {
-  animation: ledgerReveal 420ms ease forwards;
-}
+.ledger.ledger--reveal { animation: ledgerReveal 420ms ease forwards; }
 
 @keyframes ledgerReveal {
   from {
