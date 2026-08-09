@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Methodology | US Salary Tools</title>
+<meta name="description" content="Every formula and tax figure behind US Salary Tools, in full detail: 2025 federal brackets, standard deductions, FICA rates, and our state tax approximation.">
+<link rel="canonical" href="https://ussalarytools.com/methodology.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="US Salary Tools">
+<meta property="og:title" content="Methodology">
+<meta property="og:description" content="Every formula and tax figure behind US Salary Tools, in full detail: 2025 federal brackets, standard deductions, FICA rates, and our state tax approximation.">
+<meta property="og:url" content="https://ussalarytools.com/methodology.html">
+<meta property="og:image" content="https://ussalarytools.com/assets/og-image.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Methodology">
+<meta name="twitter:description" content="Every formula and tax figure behind US Salary Tools, in full detail: 2025 federal brackets, standard deductions, FICA rates, and our state tax approximation.">
+<meta name="twitter:image" content="https://ussalarytools.com/assets/og-image.png">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/css/style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ussalarytools.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Methodology", "item": "https://ussalarytools.com/methodology.html" }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="brand">
+      <svg class="brand__mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="3" width="26" height="26" rx="7" fill="#B87F26"/>
+        <path d="M10 22V10h3.6c2.3 0 3.7 1.3 3.7 3.3 0 1.6-1 2.7-2.3 3l2.7 5.7h-2.4l-2.4-5.2h-.9V22H10Zm2-6.9h1.3c1.1 0 1.7-.6 1.7-1.6 0-1-.6-1.5-1.7-1.5H12v3.1Z" fill="#0B2545"/>
+      </svg>
+      US Salary Tools
+    </a>
+
+    <nav class="nav-desktop" aria-label="Primary">
+      <a href="/">Home</a>
+      <div class="nav-dropdown" data-open="false">
+        <button class="nav-dropdown__trigger" aria-expanded="false" aria-haspopup="true">
+          Calculators
+          <svg class="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="nav-dropdown__panel">
+          <a href="/salary-calculator.html">Salary Calculator</a>
+          <a href="/hourly-to-salary.html">Hourly to Salary</a>
+          <a href="/salary-to-hourly.html">Salary to Hourly</a>
+          <a href="/overtime-calculator.html">Overtime Calculator</a>
+          <a href="/paycheck-calculator.html">Paycheck Calculator</a>
+          <a href="/raise-calculator.html">Raise Calculator</a>
+        </div>
+      </div>
+      <a href="/about.html">About</a>
+      <a href="/methodology.html" aria-current="page">Methodology</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+
+    <button class="nav-toggle" aria-expanded="false" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <nav class="nav-mobile" data-open="false" aria-label="Mobile">
+    <ul class="nav-mobile__list">
+      <li><a href="/">Home</a></li>
+      <li><a href="/salary-calculator.html">Salary Calculator</a></li>
+      <li><a href="/hourly-to-salary.html">Hourly to Salary</a></li>
+      <li><a href="/salary-to-hourly.html">Salary to Hourly</a></li>
+      <li><a href="/overtime-calculator.html">Overtime Calculator</a></li>
+      <li><a href="/paycheck-calculator.html">Paycheck Calculator</a></li>
+      <li><a href="/raise-calculator.html">Raise Calculator</a></li>
+      <li><a href="/about.html">About</a></li>
+      <li><a href="/methodology.html" aria-current="page">Methodology</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<div class="breadcrumb">
+  <div class="container">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li aria-current="page">Methodology</li>
+    </ol>
+  </div>
+</div>
+
+<main id="main">
+  <section>
+    <div class="container">
+      <span class="eyebrow">Full Transparency · Tax Year 2025</span>
+      <h1>Methodology</h1>
+      <p class="text-muted max-w-prose mb-5">Every formula and every tax figure used across US Salary Tools, documented in full. Last reviewed: August 8, 2026.</p>
+
+      <div class="max-w-prose">
+        <h2>Salary, Hourly-to-Salary &amp; Salary-to-Hourly Calculators</h2>
+        <p>These three calculators share the same underlying math:</p>
+      </div>
+
+      <div class="data-table-wrap mb-6" style="max-width:640px;">
+        <table class="data-table">
+          <thead><tr><th>Figure</th><th>Formula</th></tr></thead>
+          <tbody>
+            <tr><td>Annual (from hourly)</td><td>Hourly rate × hours/week × weeks/year</td></tr>
+            <tr><td>Hourly (from annual)</td><td>Annual ÷ (hours/week × weeks/year)</td></tr>
+            <tr><td>Monthly</td><td>Annual ÷ 12</td></tr>
+            <tr><td>Biweekly</td><td>Annual ÷ 26</td></tr>
+            <tr><td>Weekly</td><td>Annual ÷ 52</td></tr>
+            <tr><td>Daily</td><td>Weekly ÷ 5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="max-w-prose text-muted mb-6">Monthly, biweekly, and weekly figures assume a standard year-round pay schedule (52 weeks). The hourly-equivalent figure uses your actual entered hours per week and weeks per year, so it stays accurate for part-year or part-time schedules.</p>
+
+      <div class="max-w-prose">
+        <h2>Overtime Calculator</h2>
+      </div>
+      <div class="data-table-wrap mb-6" style="max-width:640px;">
+        <table class="data-table">
+          <tbody>
+            <tr><td>Regular Pay</td><td>Regular hourly rate × regular hours</td></tr>
+            <tr><td>Overtime Rate</td><td>Regular hourly rate × overtime multiplier</td></tr>
+            <tr><td>Overtime Pay</td><td>Overtime rate × overtime hours</td></tr>
+            <tr><td>Total Pay</td><td>Regular pay + overtime pay</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="max-w-prose text-muted mb-6">The default multiplier is 1.5x ("time and a half"), the U.S. federal standard for eligible overtime under the Fair Labor Standards Act (FLSA). This calculator does not determine your overtime eligibility — it performs the math once you supply your hours and rate.</p>
+
+      <div class="max-w-prose">
+        <h2>Raise Calculator</h2>
+      </div>
+      <div class="data-table-wrap mb-6" style="max-width:640px;">
+        <table class="data-table">
+          <tbody>
+            <tr><td>Raise Amount</td><td>Current salary × (raise % ÷ 100)</td></tr>
+            <tr><td>New Salary</td><td>Current salary + raise amount</td></tr>
+            <tr><td>Monthly / Biweekly Increase</td><td>Raise amount ÷ 12, or ÷ 26</td></tr>
+            <tr><td>Hourly Increase</td><td>Raise amount ÷ (hours/week × weeks/year)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="max-w-prose">
+        <h2>Paycheck Calculator (Estimator)</h2>
+        <p>This is the most complex calculator on the site, and the one most worth reading closely. It estimates <strong>net pay</strong> from a gross annual salary using three components:</p>
+
+        <h3 class="mt-5">1. Federal income tax</h3>
+        <p>We subtract the 2025 standard deduction from your gross salary to get taxable income, then apply the 2025 IRS marginal tax brackets for your filing status.</p>
+      </div>
+
+      <div class="data-table-wrap mb-4" style="max-width:420px;">
+        <table class="data-table">
+          <caption>2025 Standard Deduction</caption>
+          <thead><tr><th>Filing Status</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td>Single</td><td>$15,750</td></tr>
+            <tr><td>Married Filing Jointly</td><td>$31,500</td></tr>
+            <tr><td>Head of Household</td><td>$23,625</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="data-table-wrap mb-5">
+        <table class="data-table">
+          <caption>Single — 2025 Federal Tax Brackets</caption>
+          <thead><tr><th>Taxable Income</th><th>Rate</th></tr></thead>
+          <tbody>
+            <tr><td>$0 – $11,925</td><td>10%</td></tr>
+            <tr><td>$11,925 – $48,475</td><td>12%</td></tr>
+            <tr><td>$48,475 – $103,350</td><td>22%</td></tr>
+            <tr><td>$103,350 – $197,300</td><td>24%</td></tr>
+            <tr><td>$197,300 – $250,525</td><td>32%</td></tr>
+            <tr><td>$250,525 – $626,350</td><td>35%</td></tr>
+            <tr><td>$626,350 – and up</td><td>37%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="data-table-wrap mb-5">
+        <table class="data-table">
+          <caption>Married Filing Jointly — 2025 Federal Tax Brackets</caption>
+          <thead><tr><th>Taxable Income</th><th>Rate</th></tr></thead>
+          <tbody>
+            <tr><td>$0 – $23,850</td><td>10%</td></tr>
+            <tr><td>$23,850 – $96,950</td><td>12%</td></tr>
+            <tr><td>$96,950 – $206,700</td><td>22%</td></tr>
+            <tr><td>$206,700 – $394,600</td><td>24%</td></tr>
+            <tr><td>$394,600 – $501,050</td><td>32%</td></tr>
+            <tr><td>$501,050 – $751,600</td><td>35%</td></tr>
+            <tr><td>$751,600 – and up</td><td>37%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="data-table-wrap mb-5">
+        <table class="data-table">
+          <caption>Head of Household — 2025 Federal Tax Brackets</caption>
+          <thead><tr><th>Taxable Income</th><th>Rate</th></tr></thead>
+          <tbody>
+            <tr><td>$0 – $17,000</td><td>10%</td></tr>
+            <tr><td>$17,000 – $64,850</td><td>12%</td></tr>
+            <tr><td>$64,850 – $103,350</td><td>22%</td></tr>
+            <tr><td>$103,350 – $197,300</td><td>24%</td></tr>
+            <tr><td>$197,300 – $250,500</td><td>32%</td></tr>
+            <tr><td>$250,500 – $626,350</td><td>35%</td></tr>
+            <tr><td>$626,350 – and up</td><td>37%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="max-w-prose">
+        <h3 class="mt-5">2. FICA (Social Security &amp; Medicare)</h3>
+        <p>Applied to gross wages, independent of filing status brackets:</p>
+      </div>
+      <div class="data-table-wrap mb-6" style="max-width:640px;">
+        <table class="data-table">
+          <tbody>
+            <tr><td>Social Security</td><td>6.2% of wages up to the 2025 wage base of $176,100</td></tr>
+            <tr><td>Medicare</td><td>1.45% of all wages, no cap</td></tr>
+            <tr><td>Additional Medicare Tax</td><td>+0.9% on wages above $200,000 ($250,000 if Married Filing Jointly)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="max-w-prose">
+        <h3 class="mt-5">3. State income tax (simplified)</h3>
+        <p>Modeling all 50 states' exact bracket structures, standard deductions, and local taxes is beyond what a free, transparent calculator can responsibly claim to do. Instead, we apply <strong>one flat approximate rate per state</strong> directly to your gross salary. This is a deliberate simplification — treat it as directionally useful, not exact.</p>
+      </div>
+
+      <div class="data-table-wrap mb-6">
+        <table class="data-table">
+          <caption>State Tax Approximation (Simplified Flat Rate)</caption>
+          <thead><tr><th>State</th><th>Code</th><th>Approx. Rate</th></tr></thead>
+          <tbody>
+            <tr><td>Alabama</td><td>AL</td><td>5%</td></tr>
+            <tr><td>Alaska</td><td>AK</td><td>No income tax</td></tr>
+            <tr><td>Arizona</td><td>AZ</td><td>2.5%</td></tr>
+            <tr><td>Arkansas</td><td>AR</td><td>3.9%</td></tr>
+            <tr><td>California</td><td>CA</td><td>6%</td></tr>
+            <tr><td>Colorado</td><td>CO</td><td>4.4%</td></tr>
+            <tr><td>Connecticut</td><td>CT</td><td>5.5%</td></tr>
+            <tr><td>Delaware</td><td>DE</td><td>4.8%</td></tr>
+            <tr><td>District of Columbia</td><td>DC</td><td>6.5%</td></tr>
+            <tr><td>Florida</td><td>FL</td><td>No income tax</td></tr>
+            <tr><td>Georgia</td><td>GA</td><td>5.19%</td></tr>
+            <tr><td>Hawaii</td><td>HI</td><td>6.5%</td></tr>
+            <tr><td>Idaho</td><td>ID</td><td>5.3%</td></tr>
+            <tr><td>Illinois</td><td>IL</td><td>4.95%</td></tr>
+            <tr><td>Indiana</td><td>IN</td><td>3%</td></tr>
+            <tr><td>Iowa</td><td>IA</td><td>3.8%</td></tr>
+            <tr><td>Kansas</td><td>KS</td><td>5.2%</td></tr>
+            <tr><td>Kentucky</td><td>KY</td><td>4%</td></tr>
+            <tr><td>Louisiana</td><td>LA</td><td>3%</td></tr>
+            <tr><td>Maine</td><td>ME</td><td>6%</td></tr>
+            <tr><td>Maryland</td><td>MD</td><td>4.75%</td></tr>
+            <tr><td>Massachusetts</td><td>MA</td><td>5%</td></tr>
+            <tr><td>Michigan</td><td>MI</td><td>4.25%</td></tr>
+            <tr><td>Minnesota</td><td>MN</td><td>6%</td></tr>
+            <tr><td>Mississippi</td><td>MS</td><td>4.4%</td></tr>
+            <tr><td>Missouri</td><td>MO</td><td>4%</td></tr>
+            <tr><td>Montana</td><td>MT</td><td>5%</td></tr>
+            <tr><td>Nebraska</td><td>NE</td><td>4.5%</td></tr>
+            <tr><td>Nevada</td><td>NV</td><td>No income tax</td></tr>
+            <tr><td>New Hampshire</td><td>NH</td><td>No income tax</td></tr>
+            <tr><td>New Jersey</td><td>NJ</td><td>4.5%</td></tr>
+            <tr><td>New Mexico</td><td>NM</td><td>3.5%</td></tr>
+            <tr><td>New York</td><td>NY</td><td>5.5%</td></tr>
+            <tr><td>North Carolina</td><td>NC</td><td>4.25%</td></tr>
+            <tr><td>North Dakota</td><td>ND</td><td>1.1%</td></tr>
+            <tr><td>Ohio</td><td>OH</td><td>2.8%</td></tr>
+            <tr><td>Oklahoma</td><td>OK</td><td>4.25%</td></tr>
+            <tr><td>Oregon</td><td>OR</td><td>7%</td></tr>
+            <tr><td>Pennsylvania</td><td>PA</td><td>3.07%</td></tr>
+            <tr><td>Rhode Island</td><td>RI</td><td>4.75%</td></tr>
+            <tr><td>South Carolina</td><td>SC</td><td>5%</td></tr>
+            <tr><td>South Dakota</td><td>SD</td><td>No income tax</td></tr>
+            <tr><td>Tennessee</td><td>TN</td><td>No income tax</td></tr>
+            <tr><td>Texas</td><td>TX</td><td>No income tax</td></tr>
+            <tr><td>Utah</td><td>UT</td><td>4.55%</td></tr>
+            <tr><td>Vermont</td><td>VT</td><td>6%</td></tr>
+            <tr><td>Virginia</td><td>VA</td><td>5%</td></tr>
+            <tr><td>Washington</td><td>WA</td><td>No income tax</td></tr>
+            <tr><td>West Virginia</td><td>WV</td><td>4%</td></tr>
+            <tr><td>Wisconsin</td><td>WI</td><td>5%</td></tr>
+            <tr><td>Wyoming</td><td>WY</td><td>No income tax</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="max-w-prose">
+        <h3 class="mt-5">What the Paycheck Calculator does NOT include</h3>
+        <ul style="padding-left:1.2em;list-style:disc;color:var(--color-text-muted);">
+          <li>Pre-tax deductions: 401(k)/403(b) contributions, HSA/FSA, employer health insurance premiums</li>
+          <li>Tax credits: Child Tax Credit, Earned Income Tax Credit, education credits, etc.</li>
+          <li>Local or city income taxes (e.g., NYC, Philadelphia)</li>
+          <li>Self-employment tax, additional income, or itemized deductions</li>
+        </ul>
+
+        <h2 class="mt-6">Sources</h2>
+        <p>Federal bracket and standard deduction figures are drawn from IRS Revenue Procedure 2024-40 as adjusted by the One Big Beautiful Bill Act (OBBBA), cross-referenced against third-party tax policy research. FICA figures are drawn from Social Security Administration published wage base figures. State rates are our own simplified approximations compiled from publicly available state tax agency information. This page is reviewed periodically — always confirm critical figures against <a class="link" href="https://www.irs.gov" rel="noopener">irs.gov</a> or <a class="link" href="https://www.ssa.gov" rel="noopener">ssa.gov</a> directly.</p>
+
+        <div class="callout mt-5"><strong>Reminder:</strong> every figure above feeds an <em>estimate</em>. See our full <a class="link" href="/disclaimer.html">Disclaimer</a> before relying on any result for a financial decision.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand" style="color:#fff;">US Salary Tools</a>
+        <p>Free, fast, privacy-first calculators for salary, hourly pay, overtime, raises, and paycheck estimates — built for U.S. workers.</p>
+      </div>
+      <div>
+        <h4>Calculators</h4>
+        <ul>
+          <li><a href="/salary-calculator.html">Salary Calculator</a></li>
+          <li><a href="/hourly-to-salary.html">Hourly to Salary</a></li>
+          <li><a href="/salary-to-hourly.html">Salary to Hourly</a></li>
+          <li><a href="/overtime-calculator.html">Overtime Calculator</a></li>
+          <li><a href="/paycheck-calculator.html">Paycheck Calculator</a></li>
+          <li><a href="/raise-calculator.html">Raise Calculator</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="/methodology.html">Methodology</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Use</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer-disclaimer">US Salary Tools is an independent resource and is not affiliated with the IRS, Social Security Administration, or any U.S. government agency. All calculators provide estimates for informational purposes only and should not be treated as financial, tax, or legal advice.</p>
+
+    <div class="footer-bottom">
+      <span>© <span class="current-year"></span> US Salary Tools. All rights reserved.</span>
+      <span>Made for U.S. workers, freelancers, and job seekers.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="cookie-banner" data-visible="false">
+  <p>We use cookies for basic analytics and to support free ads that keep this site free. See our <a href="/privacy-policy.html" class="link" style="color:#fff;">Privacy Policy</a>.</p>
+  <div class="cookie-banner__actions">
+    <button type="button" class="btn btn-secondary" data-consent="declined" style="color:#fff;border-color:rgba(255,255,255,0.3);">Decline</button>
+    <button type="button" class="btn btn-gold" data-consent="accepted">Accept</button>
+  </div>
+</div>
+
+<noscript>
+  <div style="background:#FBEAE9;color:#7A241E;padding:16px;text-align:center;">This site's calculators require JavaScript to run. Please enable JavaScript in your browser to use them.</div>
+</noscript>
+<script src="/js/utils.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
