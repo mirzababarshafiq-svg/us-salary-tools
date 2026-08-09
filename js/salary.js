@@ -120,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     highlightRow(selectFrequency.value);
     ledger.hidden = false;
+     ledger.classList.remove("ledger--reveal"); void ledger.offsetWidth; ledger.classList.add("ledger--reveal");
 
     lastResult = {
       annual: UST.formatCurrency(annual, { whole: true }),
