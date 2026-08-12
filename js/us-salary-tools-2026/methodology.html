@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Methodology - US Salary Tools 2026</title></head>
+<body>
+<h1>Methodology - Tax Year 2026 Engine v2026.1.0</h1>
+<p>Last verified: 2026-05-13</p>
+<h2>Overview</h2>
+<p>This site uses a single authoritative engine module <code>js/tax-engine/index.js</code> that is the sole source of truth for all calculations. Salary, paycheck, state comparison, hourly converters all call the same functions.</p>
+
+<h2>Pipeline Order (§4.1)</h2>
+<ol>
+<li>Normalize income (hourly/weekly/biweekly/semimonthly/monthly/daily → annual gross)</li>
+<li>Sanitize & validate inputs (clamp negative, locale handling, max $1T)</li>
+<li>Classify deductions (traditional 401k pretaxFedOnly, Roth post-tax, HSA via payroll pretaxFedFica, health/FSA cafeteria, other pretax)</li>
+<li>Calculate taxable wages per base: federal, Social Security, Medicare, state</li>
+<li>Calculate federal taxable income = federalTaxableWages - standardDeduction (2026: $16,100 single, $32,200 MFJ, $16,100 MFS, $24,150 HoH) - extra for age65/blind</li>
+<li>Federal income tax via 2026 brackets (IRS Rev Proc 2025-32): 10% up to $12,400 single / $24,800 MFJ, 12% to $50,400 / $100,800, 22% to $105,700 / $211,400, 24% to $201,775 / $403,550, 32% to $256,225 / $512,450, 35% to $640,600 / $768,700, 37% above. HoH and MFS per IRS tables.</li>
+<li>Withholding realism: Option A implemented - Pub 15-T Percentage Method Automated Payroll Systems. Inputs: filingStatus, multipleJobs checkbox (simplified 5% uplift documented), dependentAmount (Step 3 credit), otherIncome (Step 4a), deductions (Step 4b), extraWithholding (Step 4c). Method disclosed in UI.</li>
+<li>FICA: Social Security 6.2% on wages up to $184,500 (SSA 2026) max $11,439, capped per paycheck. Medicare 1.45% no cap. Additional Medicare 0.9% liability thresholds: Single/HoH $200k, MFJ $250k, MFS $125k. Withholding trigger $200k regardless filing status (employer must withhold 0.9% on wages >$200k).</li>
+<li>401k limits: electiveDeferralLimit $24,500, catch-up 50+ $8,000, enhanced 60-63 $11,250 per SECURE 2.0, overall $72,000 / $80,000 / $83,250, compensation limit $360k. Source IRS retirement topics 2026.</li>
+<li>HSA limits: self-only $4,400, family $8,750, catch-up 55+ $1,000 per IRS Rev Proc 2025-19. Via payroll reduces FICA, outside payroll does not.</li>
+<li>State taxable income = stateTaxableWagesGross - state standard deduction - personal exemption (per Tax Foundation 2026 + state DOR).</li>
+<li>State income tax via data-driven file data/states-2026.js - 50 states + DC, system: none, flat, progressive, specialCases. Brackets from Tax Foundation 2026 as of Jan 1 2026, plus mid-year updates (GA HB 463 flat 4.99% retroactive). Confidence labeling: verified where official DOR cross-checked, else estimate.</li>
+<li>State payroll taxes: CA SDI 1.3% no cap, NY PFL 0.432% max $411.91, NJ TDI 0.19% FLI 0.23% up to $171,100, WA PFML 1.13% total employee ~0.71% + WA Cares 0.58% no cap, CO FAMLI 0.88% total 0.44% employee up to $184,500, CT PFML 0.5% up to $184,500, MA PFML 0.46% employee, RI TDI 1.1% up to $100k, OR Paid Leave 1% total 0.6% employee estimate, etc.</li>
+<li>Local tax: explicitly $0 + not modeled flag. Excluded: NYC, Yonkers, PA EIT/LST, Ohio municipal, Maryland county, MO KC/St Louis, Indiana county, Michigan cities, Kentucky/Alabama occupational, NY MCTMT. Disclosed.</li>
+<li>Net pay = gross - totalTaxes - totalDeductions (pretax + post-tax). Clamped 0 ≤ net ≤ gross. Per-period breakdown reconciles: sum per-period == annual via allocatePeriods rounding.</li>
+<li>Rounding: cents rounded only at display/breakdown, not mid-calc. All currency via Intl.NumberFormat USD, half-up. formatCurrency and formatPercent single source.</li>
+<li>Effective rate = totalTaxes / gross *100, take-home % = netAnnual / gross *100, deductions excluded from taxes.</li>
+<li>History/share: same result object used for share links, PNG export, localStorage history - no recomputation.</li>
+</ol>
+
+<h2>Deduction Treatment Matrix</h2>
+<table border="1">
+<tr><th>Type</th><th>Federal</th><th>SS</th><th>Medicare</th><th>State CA</th><th>State PA</th><th>State NJ</th></tr>
+<tr><td>Traditional 401k</td><td>Yes reduces</td><td>No</td><td>No</td><td>Yes</td><td>No (PA taxes)</td><td>Yes</td></tr>
+<tr><td>Roth 401k</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>HSA via payroll</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No (CA non-conforming)</td><td>Yes</td><td>No (NJ non-conforming)</td></tr>
+<tr><td>Health Premiums / FSA (125 cafeteria)</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes (except HSA)</td></tr>
+<tr><td>Other pretax</td><td>Yes</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Post-tax</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+</table>
+<p>PA: 401k taxable per PA DOR. NJ, CA, AL: HSA non-conforming per FTB/NJ DOL.</p>
+
+<h2>State Conformity</h2>
+<ul>
+<li>401k pretax allowed in all except PA (and PA local variations)</li>
+<li>HSA pretax: not allowed in CA, NJ, AL</li>
+<li>Cafeteria: allowed everywhere except where noted</li>
+<li>Standard deduction: uses federal amounts where state conforms to federal taxable income (CO, IA, ID, etc.), else state-specific (GA $15k/$30k per HB 463, NC $12,750/$25,500, etc.)</li>
+</ul>
+
+<h2>Edge Cases</h2>
+<ul>
+<li>$0 income → net $0, all taxes $0, empty state message "Enter your salary..."</li>
+<li>Deductions exceeding gross → clamped, warning displayed, net floored at 0</li>
+<li>Negative → validation error, no calculation</li>
+<li>Hourly non-default: totalHours = hoursPerWeek * weeksPerYear, hourly = annual / totalHours, no hardcoded 2080 when custom</li>
+<li>Monthly/semimonthly: grossAnnual = monthly*12 / semimonthly*24</li>
+<li>SS cap: capped notice displayed when wages > $184,500</li>
+<li>Additional Medicare: separate liability vs withholding displayed</li>
+<li>CA MHS 1% over $1M, MA surtax 4% over $1,083,150 (indexed) modeled as add-on</li>
+<li>Per-period sum reconciliation via allocatePeriods</li>
+</ul>
+
+<h2>Sources</h2>
+<p>See data/SOURCES.md for full source table with URLs, verified dates, confidence.</p>
+<ul>
+<li>Federal: IRS Rev Proc 2025-32, Ameriprise table, SSA wage base EY alert, IRS Pub 15, IRS retirement topics, IRS Rev Proc 2025-19</li>
+<li>State: Tax Foundation 2026 State Income Tax Rates and Brackets as of Jan 1 2026 (Feb 11 2026) - primary, plus CA FTB, CA EDD, NY DFS, NJ DOL, WA ESD, CO FAMLI, CT Paid Leave, MA DOR, RI DLT, GA HB 463</li>
+</ul>
+
+<h2>What is NOT modeled</h2>
+<ul>
+<li>Local/city/county taxes (NYC, Yonkers, etc.) → $0 + not modeled flag</li>
+<li>Itemized deductions, credits (except W-4 dependent amount, standard deduction)</li>
+<li>Self-employment, capital gains (except WA capital gains noted as excluded), AMT, etc.</li>
+<li>Employer matching, state-specific credits</li>
+</ul>
+
+<h2>Engine Version</h2>
+<p>ENGINE_VERSION 2026.1.0 TAX_YEAR 2026</p>
+
+<h2>Disclaimer</h2>
+<p>This is a 2026 take-home pay estimate, not exact withholding. Estimate only - not tax advice. Methods and limits verified 2026-05-13.</p>
+</body>
+</html>

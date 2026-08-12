@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>US Salary Tools 2026 - Test Page</title></head>
+<body>
+<h1>US Salary Tools 2026 Engine v2026.1.0 Test</h1>
+<p>Engine: <span id="engineVersion"></span> Tax Year: <span id="taxYear"></span></p>
+<div>
+  <label>Salary: <input id="annualSalary" type="number" value="75000"></label>
+  <label>State: <select id="state"><option value="CA">CA</option><option value="TX">TX</option><option value="NY">NY</option><option value="WA">WA</option><option value="NJ">NJ</option><option value="PA">PA</option></select></label>
+  <label>Filing: <select id="filingStatus"><option value="single">Single</option><option value="marriedJointly">MFJ</option><option value="marriedSeparately">MFS</option><option value="headOfHousehold">HoH</option></select></label>
+  <label>Pay Period: <select id="payFrequency"><option value="biweekly">Biweekly</option><option value="monthly">Monthly</option><option value="weekly">Weekly</option></select></label>
+  <label>401k: <input id="traditional401k" type="number" value="0"></label>
+  <label>HSA: <input id="hsa" type="number" value="0"></label>
+  <label>Age: <input id="age" type="number" value="35"></label>
+</div>
+<div id="resultCard"></div>
+<div id="warnings"></div>
+<script type="module">
+import { ENGINE_VERSION, TAX_YEAR } from "./js/tax-engine/index.js";
+import "./js/paycheck.js";
+document.getElementById("engineVersion").textContent = ENGINE_VERSION;
+document.getElementById("taxYear").textContent = TAX_YEAR;
+</script>
+</body>
+</html>

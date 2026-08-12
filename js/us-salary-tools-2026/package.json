@@ -1,0 +1,6 @@
+{
+  "name": "us-salary-tools-2026",
+  "version": "2026.1.0",
+  "type": "module",
+  "scripts": {"test": "node tests/run.js"}
+}
