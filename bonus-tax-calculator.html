@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bonus Tax Calculator — 2026 | US Salary Tools</title>
+  <meta name="description" content="Estimate bonus tax withholding and take-home bonus pay for 2026.">
+  <link rel="stylesheet" href="/css/style.css?v=2026.1.0">
+  <style>
+    :root{--ink:#0e1526;--muted:#5a6b86;--border:#d7dee7;--subtle:#f6f8fb;--brand:#2b6bff}
+    body{margin:0;background:var(--subtle);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    .bonus-page{max-width:1100px;margin:0 auto;padding:48px 24px 80px}
+    .bonus-page h1{font-size:42px;line-height:1.08;margin:0 0 12px;letter-spacing:-.03em}
+    .bonus-page .lead{max-width:720px;color:var(--muted);font-size:17px;line-height:1.6;margin:0 0 28px}
+    .bonus-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(9,20,44,.06)}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}
+    input,select{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:10px;font:inherit;margin-bottom:18px}
+    .result{font-size:40px;font-weight:800;letter-spacing:-.03em;margin:8px 0 6px}
+    .muted{color:var(--muted)}
+    .rows{display:grid;gap:10px;margin-top:18px}.row{display:flex;justify-content:space-between;border-bottom:1px solid #eef1f5;padding-bottom:9px}
+    .note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:18px}
+    @media(max-width:760px){.bonus-grid{grid-template-columns:1fr}.bonus-page h1{font-size:34px}}
+  </style>
+</head>
+<body>
+  <main class="bonus-page">
+    <h1>Bonus Tax Calculator</h1>
+    <p class="lead">Estimate federal withholding and take-home pay on a bonus. Results are estimates; actual withholding can vary by payroll setup, state, and your W-4.</p>
+    <div class="bonus-grid">
+      <section class="card">
+        <h2>Enter your bonus</h2>
+        <label for="bonus">Bonus amount</label>
+        <input id="bonus" type="number" min="0" step="100" value="5000">
+        <label for="salary">Annual salary</label>
+        <input id="salary" type="number" min="0" step="500" value="75000">
+        <label for="state">State</label>
+        <select id="state"><option value="none">No state income tax</option><option value="other">State income tax applies</option></select>
+      </section>
+      <section class="card" aria-live="polite">
+        <div class="muted">Estimated bonus take-home</div>
+        <div class="result" id="net">$3,525</div>
+        <div class="muted" id="rate">70.5% of bonus</div>
+        <div class="rows">
+          <div class="row"><span>Gross bonus</span><strong id="gross">$5,000</strong></div>
+          <div class="row"><span>Federal withholding (22%)</span><strong id="federal">−$1,100</strong></div>
+          <div class="row"><span>Social Security (6.2%)</span><strong id="ss">−$310</strong></div>
+          <div class="row"><span>Medicare (1.45%)</span><strong id="medicare">−$72.50</strong></div>
+          <div class="row"><span>Estimated state withholding</span><strong id="stateTax">$0</strong></div>
+        </div>
+        <p class="note">The 22% federal figure is a simplified supplemental-wage withholding estimate. Your final federal tax liability may differ.</p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const $=id=>document.getElementById(id);
+    const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(n);
+    function calc(){
+      const bonus=Math.max(0,Number($('bonus').value)||0);
+      const salary=Math.max(0,Number($('salary').value)||0);
+      const state=$('state').value;
+      const federal=bonus*0.22;
+      const ss=salary<184500?Math.min(bonus,184500-salary)*0.062:0;
+      const medicare=bonus*0.0145;
+      const stateTax=state==='other'?bonus*0.05:0;
+      const total=federal+ss+medicare+stateTax;
+      const net=Math.max(0,bonus-total);
+      $('gross').textContent=money(bonus);$('federal').textContent='−'+money(federal);$('ss').textContent='−'+money(ss);$('medicare').textContent='−'+money(medicare);$('stateTax').textContent='−'+money(stateTax);$('net').textContent=money(net);$('rate').textContent=(bonus?(net/bonus*100):0).toFixed(1)+'% of bonus';
+    }
+    ['bonus','salary','state'].forEach(id=>$(id).addEventListener('input',calc));
+    calc();
+  </script>
+</body>
+</html>
