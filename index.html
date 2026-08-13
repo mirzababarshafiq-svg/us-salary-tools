@@ -21,12 +21,12 @@
     .arrow{font-size:12px;opacity:.6;transition:transform .15s}.open .arrow{transform:rotate(180deg)}
     .dropdown{position:absolute;left:0;top:calc(100% + 6px);min-width:230px;padding:6px;border:1px solid var(--border);border-radius:14px;background:#fff;box-shadow:0 14px 36px rgba(9,20,44,.14);display:none}
     .dropdown.show{display:block}
-    .dropButton{width:100%;text-align:left;border:0;background:transparent;color:#0e1526;font:500 13px/1.25 inherit;padding:10px 12px;border-radius:10px;cursor:pointer}
-    .dropButton:hover{background:#f6f8fb}
+    .dropLink{display:block;width:100%;text-decoration:none;text-align:left;color:#0e1526;font:500 13px/1.25 inherit;padding:10px 12px;border-radius:10px}
+    .dropLink:hover{background:#f6f8fb}
     .version{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0b6b4f;background:#e3f7ef;border:1px solid #b9ebd8;padding:6px 9px;border-radius:999px;white-space:nowrap}
     #appFrame{position:absolute;inset:64px 0 0;width:100%;height:calc(100% - 64px);border:0;background:var(--subtle)}
     #loading{position:absolute;inset:64px 0 0;display:grid;place-items:center;color:var(--muted);font-size:14px;background:var(--subtle);z-index:5}
-    @media(max-width:800px){#shellNav{height:56px}.navInner{padding:0 12px}.brand{font-size:16px}.brandDot{width:26px;height:26px}.navLinks{gap:0}.navButton{padding:8px 7px;font-size:12px}.version{font-size:9px;padding:5px 7px}.dropdown{min-width:190px}.dropButton{font-size:12px;padding:9px 10px}#appFrame,#loading{top:56px;height:calc(100% - 56px)}}
+    @media(max-width:800px){#shellNav{height:56px}.navInner{padding:0 12px}.brand{font-size:16px}.brandDot{width:26px;height:26px}.navLinks{gap:0}.navButton{padding:8px 7px;font-size:12px}.version{font-size:9px;padding:5px 7px}.dropdown{min-width:190px}.dropLink{font-size:12px;padding:9px 10px}#appFrame,#loading{top:56px;height:calc(100% - 56px)}}
   </style>
 </head>
 <body>
@@ -38,33 +38,33 @@
           <div class="navItem" data-menu="Calculators">
             <button class="navButton" type="button">Calculators <span class="arrow">⌄</span></button>
             <div class="dropdown">
-              <button class="dropButton" data-action="calculator">Salary Calculator</button>
-              <button class="dropButton" data-action="calculator">Paycheck Calculator</button>
-              <button class="dropButton" data-action="calculator">Hourly ↔ Salary</button>
-              <button class="dropButton" data-action="calculator">Overtime Calculator</button>
-              <button class="dropButton" data-action="calculator">Bonus Tax Calculator</button>
+              <a class="dropLink" href="/salary-calculator.html">Salary Calculator</a>
+              <a class="dropLink" href="/paycheck-calculator.html">Paycheck Calculator</a>
+              <a class="dropLink" href="/hourly-to-salary.html">Hourly ↔ Salary</a>
+              <a class="dropLink" href="/overtime-calculator.html">Overtime Calculator</a>
+              <a class="dropLink" href="/bonus-tax-calculator.html">Bonus Tax Calculator</a>
             </div>
           </div>
           <div class="navItem" data-menu="States">
             <button class="navButton" type="button">States <span class="arrow">⌄</span></button>
             <div class="dropdown">
-              <button class="dropButton" data-state="California">California</button>
-              <button class="dropButton" data-state="Texas">Texas</button>
-              <button class="dropButton" data-state="New York">New York</button>
-              <button class="dropButton" data-state="Florida">Florida</button>
-              <button class="dropButton" data-state="Washington">Washington</button>
+              <a class="dropLink" href="/states/california.html">California</a>
+              <a class="dropLink" href="/states/texas.html">Texas</a>
+              <a class="dropLink" href="/states/new-york.html">New York</a>
+              <a class="dropLink" href="/states/florida.html">Florida</a>
+              <a class="dropLink" href="/states/washington.html">Washington</a>
             </div>
           </div>
           <div class="navItem" data-menu="Resources">
             <button class="navButton" type="button">Resources <span class="arrow">⌄</span></button>
             <div class="dropdown">
-              <button class="dropButton" data-resource="W-4 & Withholding">W-4 & Withholding</button>
-              <button class="dropButton" data-resource="State taxes">State taxes</button>
-              <button class="dropButton" data-resource="Retirement">Retirement</button>
-              <button class="dropButton" data-action="calculator">Methodology</button>
+              <a class="dropLink" href="/withholding.html">W-4 &amp; Withholding</a>
+              <a class="dropLink" href="/state-taxes.html">State taxes</a>
+              <a class="dropLink" href="/retirement.html">Retirement</a>
+              <a class="dropLink" href="/methodology.html">Methodology</a>
             </div>
           </div>
-          <div class="navItem"><button class="navButton" id="aboutBtn" type="button">About</button></div>
+          <div class="navItem"><a class="navButton" id="aboutLink" href="/about.html">About</a></div>
         </div>
         <div class="version">Engine v2026.1.0</div>
       </div>
@@ -92,73 +92,23 @@
       });
     });
     document.addEventListener('click',closeMenus);
-
-    function frameDoc(){try{return frame.contentDocument||frame.contentWindow.document}catch{return null}}
-    function scrollToCalculator(){const d=frameDoc();if(d){d.getElementById('calculator')?.scrollIntoView({behavior:'smooth',block:'start'})}}
-    function selectState(name){
-      const d=frameDoc(); if(!d) return;
-      const buttons=[...d.querySelectorAll('#calculator button')];
-      const trigger=buttons.find(b=>/^[A-Z]{2}\s+/.test(b.textContent.trim())&&b.textContent.includes(name));
-      if(trigger){trigger.click();setTimeout(()=>{const item=[...d.querySelectorAll('button')].find(b=>b.textContent.trim()===name);if(item)item.click()},40)}
-      setTimeout(scrollToCalculator,80);
-    }
-    function scrollToResource(name){
-      const d=frameDoc(); if(!d) return;
-      const nodes=[...d.querySelectorAll('h1,h2,h3,h4,div,span')];
-      const node=nodes.find(n=>(n.textContent||'').trim()===name)||nodes.find(n=>(n.textContent||'').includes(name));
-      if(node) node.scrollIntoView({behavior:'smooth',block:'start'}); else scrollToCalculator();
-    }
-
-    document.querySelectorAll('.dropButton').forEach(b=>b.addEventListener('click',e=>{
-      e.stopPropagation();
-      if(b.dataset.state) selectState(b.dataset.state);
-      else if(b.dataset.resource) scrollToResource(b.dataset.resource);
-      else scrollToCalculator();
-      closeMenus();
-    }));
-    document.getElementById('aboutBtn').addEventListener('click',()=>{closeMenus();scrollToResource('Why trust these numbers')});
-
-    function patchHtml(html){
-      let s=html.replace('engineVersion:"mock-2.0.0"','engineVersion:"2026.1.0"');
-      s=s.replace(/\$\.useEffect\(\(\)=>\{localStorage\.setItem\("th-input",JSON\.stringify\(l\)\);let f=new URLSearchParams;[\s\S]*?window\.history\.replaceState\(null,"",k\)\},\[l\]\)/,'$.useEffect(()=>{localStorage.setItem("th-input",JSON.stringify(l))},[l])');
-      s=s.replace('navigator.clipboard.writeText(window.location.href)','navigator.clipboard.writeText(window.top.location.href)');
-      s=s.replace('<title>React Artifact</title>','<title>US Salary Tools — 2026</title>');
-      if(!s.includes('<base href=')) s=s.replace('</head>','<base href="https://us-salary-tools.pages.dev/"><style>header{display:none!important}body{padding-top:0!important}</style></head>');
-      return s;
-    }
-
-    function activate(){
-      loading.style.display='none';
-      try{
-        const w=frame.contentWindow,d=frameDoc();
-        if(!d||!w)return;
-        d.querySelector('header')?.remove();
-        if(w.history && !w.__salaryToolsPatched){
-          w.history.replaceState=()=>{};
-          w.history.pushState=()=>{};
-          w.__salaryToolsPatched=true;
-        }
-      }catch{}
-    }
+    document.querySelectorAll('.dropLink').forEach(a=>a.addEventListener('click',()=>closeMenus()));
 
     async function boot(){
       try{
-        let s=sessionStorage.getItem('ust2026html');
-        if(!s){
-          const r=await fetch(RAW,{cache:'no-store'});
-          if(!r.ok) throw new Error('legacy bundle fetch failed');
-          s=await r.text();
-          sessionStorage.setItem('ust2026html',s);
-        }
-        frame.srcdoc=patchHtml(s);
+        const r=await fetch(RAW,{cache:'no-store'});
+        if(!r.ok) throw new Error('legacy bundle fetch failed');
+        let s=await r.text();
+        s=s.replace('engineVersion:"mock-2.0.0"','engineVersion:"2026.1.0"');
+        s=s.replace('<title>React Artifact</title>','<title>US Salary Tools — 2026</title>');
+        if(!s.includes('<base href=')) s=s.replace('</head>','<base href="https://us-salary-tools.pages.dev/"><style>header{display:none!important}body{padding-top:0!important}</style></head>');
+        frame.srcdoc=s;
       }catch(e){
         frame.src=RAW;
       }
-      frame.addEventListener('load',activate,{once:true});
     }
+    frame.addEventListener('load',()=>{loading.style.display='none'},{once:true});
     boot();
-
-    if(location.search){history.replaceState(null,'',location.pathname+location.hash)}
   })();
   </script>
 </body>
