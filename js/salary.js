@@ -1,176 +1,68 @@
-/* =========================================================
-   US SALARY TOOLS — SALARY CALCULATOR
-   Powers the "Salary Calculator" widget: converts between
-   annual salary and hourly rate, and shows every common pay
-   period. Safe to include on any page — no-ops if the
-   #salary-calculator markup isn't present.
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-  const root = document.getElementById("salary-calculator");
-  if (!root) return;
-
-  const modeAnnualBtn = root.querySelector("#mode-annual-btn");
-  const modeHourlyBtn = root.querySelector("#mode-hourly-btn");
-  const fieldAnnual = root.querySelector("#field-annual");
-  const fieldHourly = root.querySelector("#field-hourly");
-  const inputAnnual = root.querySelector("#salary-annual");
-  const inputHourly = root.querySelector("#salary-hourly");
-  const inputHours = root.querySelector("#salary-hours");
-  const inputWeeks = root.querySelector("#salary-weeks");
-  const selectFrequency = root.querySelector("#salary-frequency");
-  const form = root.querySelector("#salary-form");
-  const resetBtn = root.querySelector("#salary-reset-btn");
-  const copyBtn = root.querySelector("#salary-copy-btn");
-  const ledger = root.querySelector("#salary-ledger");
-
-  const outputs = {
-    annually: root.querySelector("#out-annual"),
-    monthly: root.querySelector("#out-monthly"),
-    biweekly: root.querySelector("#out-biweekly"),
-    weekly: root.querySelector("#out-weekly"),
-    daily: root.querySelector("#out-daily"),
-    hourly: root.querySelector("#out-hourly"),
+import { formatCurrency } from "./tax-engine/formatting.js";
+import { sanitizeInputs, validateInputs } from "./tax-engine/validation.js";
+function getElements(){
+  return {
+    annualInput: document.getElementById("annualSalary") || document.querySelector("[data-annual-salary]"),
+    hourlyInput: document.getElementById("hourlyRate"),
+    hoursPerWeek: document.getElementById("hoursPerWeek"),
+    weeksPerYear: document.getElementById("weeksPerYear"),
+    payFrequency: document.getElementById("payFrequency"),
+    resultAnnual: document.getElementById("resultAnnual"),
+    resultMonthly: document.getElementById("resultMonthly"),
+    resultBiweekly: document.getElementById("resultBiweekly"),
+    resultWeekly: document.getElementById("resultWeekly"),
+    resultDaily: document.getElementById("resultDaily"),
+    resultHourly: document.getElementById("resultHourly"),
   };
-
-  let mode = "annual"; // "annual" | "hourly"
-  let lastResult = null;
-
-  function setMode(next) {
-    mode = next;
-    const isAnnual = mode === "annual";
-    fieldAnnual.classList.toggle("hidden", !isAnnual);
-    fieldHourly.classList.toggle("hidden", isAnnual);
-    modeAnnualBtn.setAttribute("aria-pressed", String(isAnnual));
-    modeHourlyBtn.setAttribute("aria-pressed", String(!isAnnual));
-    UST.clearFieldError(isAnnual ? inputHourly : inputAnnual);
-    calculate();
+}
+function calculate(){
+  const els=getElements();
+  if (!els.annualInput && !els.hourlyInput) return;
+  const raw={
+    grossAnnual: els.annualInput?els.annualInput.value:0,
+    hourlyRate: els.hourlyInput?els.hourlyInput.value:0,
+    hoursPerWeek: els.hoursPerWeek?els.hoursPerWeek.value:40,
+    weeksPerYear: els.weeksPerYear?els.weeksPerYear.value:52,
+    payFrequency: els.payFrequency?els.payFrequency.value:"annual"
+  };
+  const sanitized=sanitizeInputs(raw);
+  const validation=validateInputs(sanitized);
+  if (!validation.valid){
+    if (els.resultAnnual) els.resultAnnual.textContent="Enter your salary to estimate your take-home pay.";
+    return;
   }
-
-  modeAnnualBtn.addEventListener("click", () => setMode("annual"));
-  modeHourlyBtn.addEventListener("click", () => setMode("hourly"));
-
-  function highlightRow(frequency) {
-    root.querySelectorAll(".ledger__row").forEach((row) => {
-      row.classList.toggle("ledger__row--primary", row.dataset.row === frequency);
-    });
+  let grossAnnual=sanitized.grossAnnual;
+  if (raw.payFrequency==="hourly" || (els.hourlyInput && els.hourlyInput.value && !els.annualInput.value)){
+    grossAnnual=sanitized.hourlyRate*sanitized.hoursPerWeek*sanitized.weeksPerYear;
+  } else if (raw.payFrequency==="monthly") grossAnnual=sanitized.grossAnnual*12;
+  else if (raw.payFrequency==="semimonthly") grossAnnual=sanitized.grossAnnual*24;
+  else if (raw.payFrequency==="biweekly") grossAnnual=sanitized.grossAnnual*26;
+  else if (raw.payFrequency==="weekly") grossAnnual=sanitized.grossAnnual*52;
+  else if (raw.payFrequency==="daily") grossAnnual=sanitized.grossAnnual*(sanitized.daysPerYear||260);
+  if (grossAnnual===0){
+    if (els.resultAnnual) els.resultAnnual.textContent="Enter your salary to estimate your take-home pay.";
+    return;
   }
-
-  function calculate() {
-    UST.clearAllErrors(form);
-
-    const hoursResult = UST.parseNumericInput(inputHours.value, {
-      fieldLabel: "Hours per week",
-      allowZero: false,
-      max: 168,
-    });
-    const weeksResult = UST.parseNumericInput(inputWeeks.value, {
-      fieldLabel: "Weeks per year",
-      allowZero: false,
-      max: 52,
-    });
-
-    let primaryResult;
-    if (mode === "annual") {
-      primaryResult = UST.parseNumericInput(inputAnnual.value, {
-        fieldLabel: "Annual salary",
-        allowZero: false,
-      });
-    } else {
-      primaryResult = UST.parseNumericInput(inputHourly.value, {
-        fieldLabel: "Hourly rate",
-        allowZero: false,
-        max: 10000,
-      });
-    }
-
-    let hasError = false;
-    if (!hoursResult.valid) { UST.showFieldError(inputHours, hoursResult.error); hasError = true; }
-    if (!weeksResult.valid) { UST.showFieldError(inputWeeks, weeksResult.error); hasError = true; }
-    if (!primaryResult.valid) {
-      UST.showFieldError(mode === "annual" ? inputAnnual : inputHourly, primaryResult.error);
-      hasError = true;
-    }
-
-    if (hasError) {
-      ledger.hidden = true;
-      lastResult = null;
-      return;
-    }
-
-    const hours = hoursResult.value;
-    const weeks = weeksResult.value;
-
-    const annual = mode === "annual"
-      ? primaryResult.value
-      : primaryResult.value * hours * weeks;
-
-    const hourlyEquivalent = annual / (hours * weeks);
-    const monthly = annual / 12;
-    const biweekly = annual / 26;
-    const weekly = annual / 52;
-    const daily = weekly / 5;
-
-    outputs.annually.textContent = UST.formatCurrency(annual, { whole: true });
-    outputs.monthly.textContent = UST.formatCurrency(monthly);
-    outputs.biweekly.textContent = UST.formatCurrency(biweekly);
-    outputs.weekly.textContent = UST.formatCurrency(weekly);
-    outputs.daily.textContent = UST.formatCurrency(daily);
-    outputs.hourly.textContent = UST.formatCurrency(hourlyEquivalent);
-
-    highlightRow(selectFrequency.value);
-    ledger.hidden = false;
-     ledger.classList.remove("ledger--reveal"); void ledger.offsetWidth; ledger.classList.add("ledger--reveal");
-
-    lastResult = {
-      annual: UST.formatCurrency(annual, { whole: true }),
-      monthly: UST.formatCurrency(monthly),
-      biweekly: UST.formatCurrency(biweekly),
-      weekly: UST.formatCurrency(weekly),
-      daily: UST.formatCurrency(daily),
-      hourly: UST.formatCurrency(hourlyEquivalent),
-    };
-  }
-
-  const debouncedCalc = UST.debounce(calculate, 400);
-  [inputAnnual, inputHourly, inputHours, inputWeeks].forEach((el) => {
-    el.addEventListener("input", debouncedCalc);
-  });
-  selectFrequency.addEventListener("change", () => {
-    if (lastResult) highlightRow(selectFrequency.value);
-  });
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    calculate();
-    if (lastResult) ledger.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-
-  resetBtn.addEventListener("click", () => {
-    form.reset();
-    inputHours.value = "40";
-    inputWeeks.value = "52";
-    selectFrequency.value = "biweekly";
-    setMode("annual");
-    UST.clearAllErrors(form);
-    ledger.hidden = true;
-    lastResult = null;
-  });
-
-  copyBtn.addEventListener("click", async () => {
-    if (!lastResult) return;
-    const text =
-      `US Salary Tools — Salary Estimate\n` +
-      `Annual: ${lastResult.annual}\n` +
-      `Monthly: ${lastResult.monthly}\n` +
-      `Biweekly: ${lastResult.biweekly}\n` +
-      `Weekly: ${lastResult.weekly}\n` +
-      `Daily: ${lastResult.daily}\n` +
-      `Hourly Equivalent: ${lastResult.hourly}`;
-    const ok = await UST.copyToClipboard(text);
-    UST.flashButtonLabel(copyBtn, ok ? "Copied!" : "Couldn't copy");
-  });
-
-  // Initial state
-  ledger.hidden = true;
+  const hoursPerWeek=sanitized.hoursPerWeek||40;
+  const weeksPerYear=sanitized.weeksPerYear||52;
+  const totalHours=hoursPerWeek*weeksPerYear;
+  const monthly=grossAnnual/12;
+  const semimonthly=grossAnnual/24;
+  const biweekly=grossAnnual/26;
+  const weekly=grossAnnual/52;
+  const daily=grossAnnual/(weeksPerYear*5);
+  const hourly=totalHours>0?grossAnnual/totalHours:0;
+  if (els.resultAnnual) els.resultAnnual.textContent=formatCurrency(grossAnnual);
+  if (els.resultMonthly) els.resultMonthly.textContent=formatCurrency(monthly);
+  if (els.resultBiweekly) els.resultBiweekly.textContent=formatCurrency(biweekly);
+  if (els.resultWeekly) els.resultWeekly.textContent=formatCurrency(weekly);
+  if (els.resultDaily) els.resultDaily.textContent=formatCurrency(daily);
+  if (els.resultHourly) els.resultHourly.textContent=formatCurrency(hourly);
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  const els=getElements();
+  const inputs=[els.annualInput,els.hourlyInput,els.hoursPerWeek,els.weeksPerYear,els.payFrequency].filter(Boolean);
+  inputs.forEach(el=>{el.addEventListener("input",calculate);el.addEventListener("change",calculate);});
+  calculate();
 });
+export {calculate};
