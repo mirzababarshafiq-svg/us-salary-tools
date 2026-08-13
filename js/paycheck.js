@@ -1,6 +1,7 @@
 import { calculateAll } from "./tax-engine/index.js";
 import { sanitizeInputs, validateInputs } from "./tax-engine/validation.js";
 import { formatCurrency, formatPercent } from "./tax-engine/formatting.js";
+
 function getElements(){
   return {
     salaryInput: document.getElementById("salary") || document.getElementById("annualSalary"),
@@ -18,25 +19,27 @@ function getElements(){
     confidenceBadge: document.getElementById("confidenceBadge")
   };
 }
+
 function collectInputs(){
   const els=getElements();
   return {
-    grossAnnual: els.salaryInput?els.salaryInput.value:0,
-    state: els.stateSelect?els.stateSelect.value:"CA",
-    filingStatus: els.filingStatus?els.filingStatus.value:"single",
-    payFrequency:"annual",
-    selectedPayPeriod: els.payFrequency?els.payFrequency.value:"biweekly",
-    age: els.age?parseInt(els.age.value)||0:0,
-    deductions:{
-      traditional401k: els.traditional401k?parseFloat(els.traditional401k.value)||0:0,
-      roth401k: els.roth401k?parseFloat(els.roth401k.value)||0:0,
-      hsa: els.hsa?parseFloat(els.hsa.value)||0:0,
-      hsaCoverage: els.hsaCoverage?els.hsaCoverage.value:"self",
-      healthPremiums: els.healthPremiums?parseFloat(els.healthPremiums.value)||0:0
+    grossAnnual: els.salaryInput ? els.salaryInput.value : 0,
+    state: els.stateSelect ? els.stateSelect.value : "CA",
+    filingStatus: els.filingStatus ? els.filingStatus.value : "single",
+    payFrequency: "annual",
+    selectedPayPeriod: els.payFrequency ? els.payFrequency.value : "biweekly",
+    age: els.age ? parseInt(els.age.value, 10) || 0 : 0,
+    deductions: {
+      traditional401k: els.traditional401k ? parseFloat(els.traditional401k.value) || 0 : 0,
+      roth401k: els.roth401k ? parseFloat(els.roth401k.value) || 0 : 0,
+      hsa: els.hsa ? parseFloat(els.hsa.value) || 0 : 0,
+      hsaCoverage: els.hsaCoverage ? els.hsaCoverage.value : "self",
+      healthPremiums: els.healthPremiums ? parseFloat(els.healthPremiums.value) || 0 : 0
     },
-    w4:{multipleJobs:false,dependentAmount:0,otherIncome:0,deductions:0,extraWithholding:0}
+    w4: {multipleJobs:false, dependentAmount:0, otherIncome:0, deductions:0, extraWithholding:0}
   };
 }
+
 function renderResult(result){
   const els=getElements();
   if (!els.resultCard) return;
@@ -49,7 +52,7 @@ function renderResult(result){
     return;
   }
   const t=result.totals;
-  const html=`
+  els.resultCard.innerHTML=`
     <div class="result-grid">
       <div>Gross Annual: <span id="resultGross">${formatCurrency(result.grossAnnual)}</span></div>
       <div>Federal Tax: <span id="resultFederalTax">${formatCurrency(result.federal.federalIncomeTax)}</span> <small>(${result.federal.confidence})</small></div>
@@ -70,40 +73,30 @@ function renderResult(result){
       ${result.deductions.limits.hsa.capped?`<div role="alert" aria-live="polite" class="notice">HSA capped to $${result.deductions.limits.hsa.limit} (${result.deductions.limits.hsa.coverage})</div>`:""}
       <div>Confidence: <span id="confidenceBadge" class="confidence-${result.confidence.overall}">${result.confidence.overall}</span></div>
       <div>Method: ${result.federal.withholding.method} - 2026 take-home pay estimate. Estimate only - not tax advice.</div>
-      <div>Engine v${result.ENGINE_VERSION} Tax Year ${result.TAX_YEAR}</div>
+      <div>Engine v${result.ENGINE_VERSION} · Tax Year ${result.TAX_YEAR}</div>
     </div>`;
-  els.resultCard.innerHTML=html;
   if (els.warningContainer){
-    if (result.warnings && result.warnings.length){
-      els.warningContainer.innerHTML=result.warnings.map(w=>`<div aria-live="polite">${w}</div>`).join("");
-    } else els.warningContainer.innerHTML="";
+    els.warningContainer.innerHTML = result.warnings && result.warnings.length
+      ? result.warnings.map(w=>`<div aria-live="polite">${w}</div>`).join("")
+      : "";
   }
   window.__lastResult=result;
 }
+
 function calculate(){
   const raw=collectInputs();
   const sanitized=sanitizeInputs(raw);
   const result=calculateAll(sanitized);
   renderResult(result);
-  try{
-    const params=new URLSearchParams(window.location.search);
-    params.set("salary",sanitized.grossAnnual);
-    params.set("state",sanitized.state);
-    params.set("filing",sanitized.filingStatus);
-    params.set("v",result.ENGINE_VERSION);
-    window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
-  }catch(e){}
+  // Intentionally do not mutate window.history or the address bar.
+  // Calculator state is local to the page and may be persisted in localStorage by the UI.
 }
+
 document.addEventListener("DOMContentLoaded",()=>{
   const els=getElements();
   const inputs=[els.salaryInput,els.stateSelect,els.filingStatus,els.payFrequency,els.traditional401k,els.roth401k,els.hsa,els.hsaCoverage,els.healthPremiums,els.age].filter(Boolean);
   inputs.forEach(el=>{el.addEventListener("input",calculate);el.addEventListener("change",calculate);});
-  try{
-    const params=new URLSearchParams(window.location.search);
-    if (params.get("salary") && els.salaryInput) els.salaryInput.value=params.get("salary");
-    if (params.get("state") && els.stateSelect) els.stateSelect.value=params.get("state").toUpperCase();
-    if (params.get("filing") && els.filingStatus) els.filingStatus.value=params.get("filing");
-  }catch(e){}
   calculate();
 });
+
 export {calculate};
