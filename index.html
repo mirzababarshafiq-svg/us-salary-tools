@@ -1,115 +1,99 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="application-version" content="2026.1.0">
-  <title>US Salary Tools — 2026</title>
-  <style>
-    :root{--ink:#0e1526;--muted:#5a6b86;--border:#d7dee7;--surface:#fff;--subtle:#f6f8fb;--brand:#2b6bff}
-    *{box-sizing:border-box}
-    html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--subtle);color:var(--ink)}
-    #shell{position:fixed;inset:0;background:var(--subtle)}
-    #shellNav{position:fixed;top:0;left:0;right:0;height:64px;z-index:1000;display:flex;align-items:center;background:rgba(255,255,255,.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);box-shadow:0 2px 10px rgba(9,20,44,.06)}
-    .navInner{width:100%;max-width:1200px;margin:auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:750;letter-spacing:-.02em;white-space:nowrap}
-    .brandDot{width:30px;height:30px;border-radius:9px;background:#0e1526;display:grid;place-items:center}.brandDot:after{content:"";width:8px;height:8px;border-radius:50%;background:#12a97a;box-shadow:0 0 0 5px rgba(18,169,122,.08)}
-    .navLinks{display:flex;align-items:center;gap:4px}
-    .navItem{position:relative}
-    .navButton{border:0;background:transparent;color:#3b4c6b;font:600 14px/1.2 inherit;padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:5px}
-    .navButton:hover,.navButton.open{background:#f6f8fb;color:#0e1526}
-    .arrow{font-size:12px;opacity:.6;transition:transform .15s}.open .arrow{transform:rotate(180deg)}
-    .dropdown{position:absolute;left:0;top:calc(100% + 6px);min-width:230px;padding:6px;border:1px solid var(--border);border-radius:14px;background:#fff;box-shadow:0 14px 36px rgba(9,20,44,.14);display:none}
-    .dropdown.show{display:block}
-    .dropLink{display:block;width:100%;text-decoration:none;text-align:left;color:#0e1526;font:500 13px/1.25 inherit;padding:10px 12px;border-radius:10px}
-    .dropLink:hover{background:#f6f8fb}
-    .version{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0b6b4f;background:#e3f7ef;border:1px solid #b9ebd8;padding:6px 9px;border-radius:999px;white-space:nowrap}
-    #appFrame{position:absolute;inset:64px 0 0;width:100%;height:calc(100% - 64px);border:0;background:var(--subtle)}
-    #loading{position:absolute;inset:64px 0 0;display:grid;place-items:center;color:var(--muted);font-size:14px;background:var(--subtle);z-index:5}
-    @media(max-width:800px){#shellNav{height:56px}.navInner{padding:0 12px}.brand{font-size:16px}.brandDot{width:26px;height:26px}.navLinks{gap:0}.navButton{padding:8px 7px;font-size:12px}.version{font-size:9px;padding:5px 7px}.dropdown{min-width:190px}.dropLink{font-size:12px;padding:9px 10px}#appFrame,#loading{top:56px;height:calc(100% - 56px)}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="application-version" content="2026.1.0">
+<title>US Salary Tools — 2026</title>
+<meta name="description" content="Free 2026 US salary and paycheck calculator with federal tax, state tax, FICA and deductions.">
+<style>
+:root{--ink:#0e1526;--muted:#5a6b86;--border:#d7dee7;--subtle:#f6f8fb;--green:#12a97a}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--subtle);color:var(--ink)}
+#shell{position:fixed;inset:0;background:var(--subtle)}
+#appFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--subtle);z-index:1}
+#shellNav{position:fixed;top:0;left:0;right:0;height:64px;z-index:1000;display:flex;align-items:center;background:rgba(255,255,255,.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(215,222,231,.95);box-shadow:0 2px 10px rgba(9,20,44,.06)}
+.navInner{width:100%;max-width:1200px;margin:auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:750;letter-spacing:-.02em;white-space:nowrap;background:none;border:0;color:var(--ink);text-decoration:none}
+.brandDot{width:30px;height:30px;border-radius:9px;background:var(--ink);display:grid;place-items:center}.brandDot:after{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 5px rgba(18,169,122,.08)}
+.navLinks{display:flex;align-items:center;gap:4px}
+.navItem{position:relative}
+.navButton{border:0;background:transparent;color:#3b4c6b;font:600 14px/1.2 inherit;padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none}
+.navButton:hover,.navButton.open{background:#f6f8fb;color:var(--ink)}
+.arrow{font-size:12px;opacity:.6;transition:transform .15s}.navButton.open .arrow{transform:rotate(180deg)}
+.dropdown{position:absolute;left:0;top:calc(100% + 6px);min-width:230px;padding:6px;border:1px solid var(--border);border-radius:14px;background:#fff;box-shadow:0 14px 36px rgba(9,20,44,.14);display:none}
+.dropdown.show{display:block}
+.dropLink{display:block;width:100%;text-decoration:none;text-align:left;color:var(--ink);font:500 13px/1.25 inherit;padding:10px 12px;border-radius:10px}
+.dropLink:hover{background:#f6f8fb}
+.version{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0b6b4f;background:#e3f7ef;border:1px solid #b9ebd8;padding:6px 9px;border-radius:999px;white-space:nowrap}
+#loading{position:fixed;inset:64px 0 0;z-index:900;display:grid;place-items:center;background:var(--subtle);color:var(--muted);font-size:14px}
+@media(max-width:900px){.navInner{padding:0 14px}.navLinks{gap:0}.navButton{padding:9px 8px;font-size:12px}.brand{font-size:17px}.version{font-size:10px;padding:5px 7px}}
+@media(max-width:700px){#shellNav{height:56px}.navInner{padding:0 10px;gap:6px}.brand{font-size:15px}.brandDot{width:26px;height:26px}.navButton{padding:8px 6px;font-size:11px}.dropdown{min-width:195px}.dropLink{font-size:12px;padding:9px 10px}.version{font-size:9px;padding:5px 6px}#loading{inset:56px 0 0}}
+</style>
 </head>
 <body>
-  <div id="shell">
-    <header id="shellNav">
-      <div class="navInner">
-        <div class="brand"><span class="brandDot"></span><span>TakeHome</span></div>
-        <div class="navLinks">
-          <div class="navItem" data-menu="Calculators">
-            <button class="navButton" type="button">Calculators <span class="arrow">⌄</span></button>
-            <div class="dropdown">
-              <a class="dropLink" href="/salary-calculator.html">Salary Calculator</a>
-              <a class="dropLink" href="/paycheck-calculator.html">Paycheck Calculator</a>
-              <a class="dropLink" href="/hourly-to-salary.html">Hourly ↔ Salary</a>
-              <a class="dropLink" href="/overtime-calculator.html">Overtime Calculator</a>
-              <a class="dropLink" href="/bonus-tax-calculator.html">Bonus Tax Calculator</a>
-            </div>
+<div id="shell">
+  <iframe id="appFrame" title="US Salary Tools" src="https://raw.githubusercontent.com/mirzababarshafiq-svg/us-salary-tools/a3bac11872b4c5bafa8bb626aa1dee10dfcd17ed/index.html" referrerpolicy="no-referrer"></iframe>
+  <header id="shellNav">
+    <div class="navInner">
+      <a class="brand" href="/" aria-label="US Salary Tools home"><span class="brandDot"></span><span>TakeHome</span></a>
+      <nav class="navLinks" aria-label="Primary navigation">
+        <div class="navItem" data-menu="Calculators">
+          <button class="navButton" type="button" aria-expanded="false">Calculators <span class="arrow">⌄</span></button>
+          <div class="dropdown">
+            <a class="dropLink" href="/salary-calculator.html">Salary Calculator</a>
+            <a class="dropLink" href="/paycheck-calculator.html">Paycheck Calculator</a>
+            <a class="dropLink" href="/hourly-to-salary.html">Hourly ↔ Salary</a>
+            <a class="dropLink" href="/overtime-calculator.html">Overtime Calculator</a>
+            <a class="dropLink" href="/bonus-tax-calculator.html">Bonus Tax Calculator</a>
           </div>
-          <div class="navItem" data-menu="States">
-            <button class="navButton" type="button">States <span class="arrow">⌄</span></button>
-            <div class="dropdown">
-              <a class="dropLink" href="/states/california.html">California</a>
-              <a class="dropLink" href="/states/texas.html">Texas</a>
-              <a class="dropLink" href="/states/new-york.html">New York</a>
-              <a class="dropLink" href="/states/florida.html">Florida</a>
-              <a class="dropLink" href="/states/washington.html">Washington</a>
-            </div>
-          </div>
-          <div class="navItem" data-menu="Resources">
-            <button class="navButton" type="button">Resources <span class="arrow">⌄</span></button>
-            <div class="dropdown">
-              <a class="dropLink" href="/withholding.html">W-4 &amp; Withholding</a>
-              <a class="dropLink" href="/state-taxes.html">State taxes</a>
-              <a class="dropLink" href="/retirement.html">Retirement</a>
-              <a class="dropLink" href="/methodology.html">Methodology</a>
-            </div>
-          </div>
-          <div class="navItem"><a class="navButton" id="aboutLink" href="/about.html">About</a></div>
         </div>
-        <div class="version">Engine v2026.1.0</div>
-      </div>
-    </header>
-    <div id="loading">Loading US Salary Tools v2026.1.0…</div>
-    <iframe id="appFrame" title="US Salary Tools calculator" referrerpolicy="no-referrer"></iframe>
-  </div>
-
-  <script>
-  (()=>{
-    const RAW='https://raw.githubusercontent.com/mirzababarshafiq-svg/us-salary-tools/a3bac11872b4c5bafa8bb626aa1dee10dfcd17ed/index.html';
-    const frame=document.getElementById('appFrame');
-    const loading=document.getElementById('loading');
-    const menus=[...document.querySelectorAll('.navItem[data-menu]')];
-
-    function closeMenus(){menus.forEach(m=>{m.querySelector('.dropdown')?.classList.remove('show');m.querySelector('.navButton')?.classList.remove('open')})}
-    menus.forEach(m=>{
-      const b=m.querySelector('.navButton');
-      b.addEventListener('click',e=>{
-        e.stopPropagation();
-        const dd=m.querySelector('.dropdown');
-        const willOpen=!dd.classList.contains('show');
-        closeMenus();
-        if(willOpen){dd.classList.add('show');b.classList.add('open')}
-      });
+        <div class="navItem" data-menu="States">
+          <button class="navButton" type="button" aria-expanded="false">States <span class="arrow">⌄</span></button>
+          <div class="dropdown">
+            <a class="dropLink" href="/states/california.html">California</a>
+            <a class="dropLink" href="/states/texas.html">Texas</a>
+            <a class="dropLink" href="/states/new-york.html">New York</a>
+            <a class="dropLink" href="/states/florida.html">Florida</a>
+            <a class="dropLink" href="/states/washington.html">Washington</a>
+          </div>
+        </div>
+        <div class="navItem" data-menu="Resources">
+          <button class="navButton" type="button" aria-expanded="false">Resources <span class="arrow">⌄</span></button>
+          <div class="dropdown">
+            <a class="dropLink" href="/withholding.html">W-4 &amp; Withholding</a>
+            <a class="dropLink" href="/state-taxes.html">State taxes</a>
+            <a class="dropLink" href="/retirement.html">Retirement</a>
+            <a class="dropLink" href="/methodology.html">Methodology</a>
+          </div>
+        </div>
+        <div class="navItem"><a class="navButton" href="/about.html">About</a></div>
+      </nav>
+      <div class="version">Engine v2026.1.0</div>
+    </div>
+  </header>
+  <div id="loading">Loading US Salary Tools v2026.1.0…</div>
+</div>
+<script>
+(()=>{
+  const menus=[...document.querySelectorAll('.navItem[data-menu]')];
+  const closeMenus=()=>menus.forEach(m=>{m.querySelector('.dropdown')?.classList.remove('show');m.querySelector('.navButton')?.classList.remove('open');m.querySelector('.navButton')?.setAttribute('aria-expanded','false')});
+  menus.forEach(m=>{
+    const b=m.querySelector('.navButton'),dd=m.querySelector('.dropdown');
+    b.addEventListener('click',e=>{
+      e.stopPropagation();
+      const open=!dd.classList.contains('show');
+      closeMenus();
+      if(open){dd.classList.add('show');b.classList.add('open');b.setAttribute('aria-expanded','true')}
     });
-    document.addEventListener('click',closeMenus);
-    document.querySelectorAll('.dropLink').forEach(a=>a.addEventListener('click',()=>closeMenus()));
-
-    async function boot(){
-      try{
-        const r=await fetch(RAW,{cache:'no-store'});
-        if(!r.ok) throw new Error('legacy bundle fetch failed');
-        let s=await r.text();
-        s=s.replace('engineVersion:"mock-2.0.0"','engineVersion:"2026.1.0"');
-        s=s.replace('<title>React Artifact</title>','<title>US Salary Tools — 2026</title>');
-        if(!s.includes('<base href=')) s=s.replace('</head>','<base href="https://us-salary-tools.pages.dev/"><style>header{display:none!important}body{padding-top:0!important}</style></head>');
-        frame.srcdoc=s;
-      }catch(e){
-        frame.src=RAW;
-      }
-    }
-    frame.addEventListener('load',()=>{loading.style.display='none'},{once:true});
-    boot();
-  })();
-  </script>
+  });
+  document.addEventListener('click',closeMenus);
+  document.querySelectorAll('.dropLink').forEach(a=>a.addEventListener('click',closeMenus));
+  const frame=document.getElementById('appFrame');
+  const loading=document.getElementById('loading');
+  frame.addEventListener('load',()=>{loading.style.display='none'}, {once:true});
+  setTimeout(()=>{loading.style.display='none'},7000);
+})();
+</script>
 </body>
 </html>
