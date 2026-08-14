@@ -1,102 +1,164 @@
-import { calculateAll } from "./tax-engine/index.js";
-import { sanitizeInputs, validateInputs } from "./tax-engine/validation.js";
-import { formatCurrency, formatPercent } from "./tax-engine/formatting.js";
+/* Paycheck Calculator — browser-safe 2026 engine bridge */
+(function () {
+  var initialized = false;
 
-function getElements(){
-  return {
-    salaryInput: document.getElementById("salary") || document.getElementById("annualSalary"),
-    stateSelect: document.getElementById("state") || document.getElementById("stateSelect"),
-    filingStatus: document.getElementById("filingStatus"),
-    payFrequency: document.getElementById("payFrequency"),
-    traditional401k: document.getElementById("traditional401k") || document.getElementById("401k"),
-    roth401k: document.getElementById("roth401k"),
-    hsa: document.getElementById("hsa"),
-    hsaCoverage: document.getElementById("hsaCoverage"),
-    healthPremiums: document.getElementById("healthPremiums"),
-    age: document.getElementById("age"),
-    resultCard: document.getElementById("resultCard") || document.getElementById("paycheckResult"),
-    warningContainer: document.getElementById("warnings") || document.getElementById("validationMessages"),
-    confidenceBadge: document.getElementById("confidenceBadge")
-  };
-}
-
-function collectInputs(){
-  const els=getElements();
-  return {
-    grossAnnual: els.salaryInput ? els.salaryInput.value : 0,
-    state: els.stateSelect ? els.stateSelect.value : "CA",
-    filingStatus: els.filingStatus ? els.filingStatus.value : "single",
-    payFrequency: "annual",
-    selectedPayPeriod: els.payFrequency ? els.payFrequency.value : "biweekly",
-    age: els.age ? parseInt(els.age.value, 10) || 0 : 0,
-    deductions: {
-      traditional401k: els.traditional401k ? parseFloat(els.traditional401k.value) || 0 : 0,
-      roth401k: els.roth401k ? parseFloat(els.roth401k.value) || 0 : 0,
-      hsa: els.hsa ? parseFloat(els.hsa.value) || 0 : 0,
-      hsaCoverage: els.hsaCoverage ? els.hsaCoverage.value : "self",
-      healthPremiums: els.healthPremiums ? parseFloat(els.healthPremiums.value) || 0 : 0
-    },
-    w4: {multipleJobs:false, dependentAmount:0, otherIncome:0, deductions:0, extraWithholding:0}
-  };
-}
-
-function renderResult(result){
-  const els=getElements();
-  if (!els.resultCard) return;
-  if (result.error){
-    els.resultCard.innerHTML=`<div role="alert" aria-live="polite">Please check inputs: ${result.errors.map(e=>e.message).join(", ")}</div>`;
-    return;
+  function money(n) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(n) || 0);
   }
-  if (result.grossAnnual===0){
-    els.resultCard.innerHTML=`<div aria-live="polite">Enter your salary to estimate your take-home pay.</div>`;
-    return;
+
+  function percent(n) {
+    return (Number(n) || 0).toFixed(1) + '%';
   }
-  const t=result.totals;
-  els.resultCard.innerHTML=`
-    <div class="result-grid">
-      <div>Gross Annual: <span id="resultGross">${formatCurrency(result.grossAnnual)}</span></div>
-      <div>Federal Tax: <span id="resultFederalTax">${formatCurrency(result.federal.federalIncomeTax)}</span> <small>(${result.federal.confidence})</small></div>
-      <div>State Tax (${result.stateAbbr}): <span id="resultStateTax">${formatCurrency(result.state.stateIncomeTax)}</span> <small>${result.confidence.state}</small></div>
-      <div>Social Security: <span id="resultSocialSecurity">${formatCurrency(result.fica.socialSecurity.socialSecurityTax)}</span> ${result.fica.socialSecurity.capped?'<small>Capped at $184,500</small>':''}</div>
-      <div>Medicare: <span id="resultMedicare">${formatCurrency(result.fica.medicare.medicareTax)}</span></div>
-      <div>Additional Medicare: <span id="resultAdditionalMedicare">${formatCurrency(result.fica.additionalMedicare.additionalMedicareWithholding)}</span> <small>Threshold $${result.fica.additionalMedicare.threshold} | Withholding $200k</small></div>
-      <div>State Payroll (SDI/PFL): <span id="resultStatePayroll">${formatCurrency(result.state.payroll.totalStatePayrollTax)}</span></div>
-      <div>Local Tax: $0 <small>${result.local.note}</small></div>
-      <div>Total Taxes: <span id="resultTotalTax">${formatCurrency(t.totalTaxes)}</span></div>
-      <div>Net Annual: <span id="resultNetAnnual">${formatCurrency(t.netAnnual)}</span></div>
-      <div>Net Monthly: <span id="resultNetMonthly">${formatCurrency(t.netMonthly)}</span></div>
-      <div>Net Biweekly: <span id="resultNetBiweekly">${formatCurrency(t.netBiweekly)}</span></div>
-      <div>Effective Rate: <span id="resultEffectiveRate">${formatPercent(t.effectiveTaxRate)}</span></div>
-      <div>Take-home %: <span id="resultTakeHome">${formatPercent(t.takeHomePercent)}</span></div>
-      <div>Pay Period (${t.periodsPerYear}/yr): Gross ${formatCurrency(t.grossPerSelectedPeriod)} Net ${formatCurrency(t.netPerSelectedPeriod)}</div>
-      ${result.deductions.limits["401k"].capped?`<div role="alert" aria-live="polite" class="notice">401(k) capped to $${result.deductions.limits["401k"].limit}</div>`:""}
-      ${result.deductions.limits.hsa.capped?`<div role="alert" aria-live="polite" class="notice">HSA capped to $${result.deductions.limits.hsa.limit} (${result.deductions.limits.hsa.coverage})</div>`:""}
-      <div>Confidence: <span id="confidenceBadge" class="confidence-${result.confidence.overall}">${result.confidence.overall}</span></div>
-      <div>Method: ${result.federal.withholding.method} - 2026 take-home pay estimate. Estimate only - not tax advice.</div>
-      <div>Engine v${result.ENGINE_VERSION} · Tax Year ${result.TAX_YEAR}</div>
-    </div>`;
-  if (els.warningContainer){
-    els.warningContainer.innerHTML = result.warnings && result.warnings.length
-      ? result.warnings.map(w=>`<div aria-live="polite">${w}</div>`).join("")
-      : "";
+
+  function el(id) { return document.getElementById(id); }
+
+  function numberValue(id, fallback) {
+    var node = el(id);
+    if (!node) return fallback || 0;
+    var n = parseFloat(String(node.value || '').replace(/[$,\s]/g, ''));
+    return Number.isFinite(n) ? n : (fallback || 0);
   }
-  window.__lastResult=result;
-}
 
-function calculate(){
-  const raw=collectInputs();
-  const sanitized=sanitizeInputs(raw);
-  const result=calculateAll(sanitized);
-  renderResult(result);
-  // Intentionally do not mutate window.history or the address bar.
-  // Calculator state is local to the page and may be persisted in localStorage by the UI.
-}
+  function ensureStates(STATES_2026) {
+    var select = el('pc-state');
+    if (!select || select.options.length) return;
+    Object.keys(STATES_2026).sort(function (a, b) {
+      return String(STATES_2026[a].name || a).localeCompare(String(STATES_2026[b].name || b));
+    }).forEach(function (abbr) {
+      var option = document.createElement('option');
+      option.value = abbr;
+      option.textContent = STATES_2026[abbr].name || abbr;
+      select.appendChild(option);
+    });
+    select.value = 'TX';
+  }
 
-document.addEventListener("DOMContentLoaded",()=>{
-  const els=getElements();
-  const inputs=[els.salaryInput,els.stateSelect,els.filingStatus,els.payFrequency,els.traditional401k,els.roth401k,els.hsa,els.hsaCoverage,els.healthPremiums,els.age].filter(Boolean);
-  inputs.forEach(el=>{el.addEventListener("input",calculate);el.addEventListener("change",calculate);});
-  calculate();
-});
+  function render(result) {
+    var ledger = el('pc-ledger');
+    if (!ledger) return;
+    if (result.error) {
+      ledger.hidden = false;
+      el('out-pc-net').textContent = 'Check inputs';
+      var note = el('pc-state-note');
+      if (note) note.textContent = (result.errors || []).map(function (e) { return e.message; }).join(' · ');
+      return;
+    }
 
-export {calculate};
+    var t = result.totals;
+    var period = el('pc-frequency') ? el('pc-frequency').value : 'biweekly';
+    var grossPeriod = {
+      weekly: t.grossAnnual / 52,
+      biweekly: t.grossAnnual / 26,
+      semimonthly: t.grossAnnual / 24,
+      monthly: t.grossAnnual / 12
+    }[period] || t.grossAnnual / 26;
+    var netPeriod = {
+      weekly: t.netWeekly,
+      biweekly: t.netBiweekly,
+      semimonthly: t.netSemimonthly,
+      monthly: t.netMonthly
+    }[period] || t.netBiweekly;
+
+    el('out-pc-gross').textContent = money(grossPeriod);
+    el('out-pc-federal').textContent = money(result.federal.federalIncomeTax / (t.periodsPerYear || 26));
+    el('out-pc-state').textContent = money((result.state.stateIncomeTax + result.state.payroll.totalStatePayrollTax) / (t.periodsPerYear || 26));
+    el('out-pc-fica').textContent = money(result.fica.totalForNetPay / (t.periodsPerYear || 26));
+    el('out-pc-net').textContent = money(netPeriod);
+    el('out-pc-annual-gross').textContent = money(result.grossAnnual);
+    el('out-pc-annual-net').textContent = money(t.netAnnual);
+    el('out-pc-effective-rate').textContent = percent(t.effectiveTaxRate);
+
+    var note = el('pc-state-note');
+    if (note) {
+      note.textContent = '2026 estimate · ' + (result.stateName || result.stateAbbr) + ' · Engine v' + result.ENGINE_VERSION + '. Local/city taxes may not be included.';
+    }
+    ledger.hidden = false;
+    window.__lastPaycheckResult = result;
+  }
+
+  async function calculate() {
+    try {
+      var engine = await import('./tax-engine/index.js');
+      var statesModule = await import('../data/states-2026.js');
+      ensureStates(statesModule.STATES_2026);
+
+      var raw = {
+        grossAnnual: numberValue('pc-salary', 0),
+        state: (el('pc-state') && el('pc-state').value) || 'TX',
+        filingStatus: (el('pc-filing-status') && el('pc-filing-status').value) || 'single',
+        payFrequency: 'annual',
+        selectedPayPeriod: (el('pc-frequency') && el('pc-frequency').value) || 'biweekly',
+        age: 0,
+        deductions: {},
+        w4: {}
+      };
+
+      if (raw.grossAnnual <= 0) {
+        var ledger = el('pc-ledger');
+        if (ledger) ledger.hidden = true;
+        return;
+      }
+
+      var sanitized = engine.sanitizeInputs(raw);
+      var result = engine.calculateAll(sanitized);
+      render(result);
+    } catch (err) {
+      var fallback = el('pc-ledger');
+      if (fallback) fallback.hidden = false;
+      var out = el('out-pc-net');
+      if (out) out.textContent = 'Unable to calculate';
+      var note = el('pc-state-note');
+      if (note) note.textContent = 'Calculator error: ' + (err && err.message ? err.message : 'unknown error');
+    }
+  }
+
+  function init() {
+    if (initialized) return;
+    initialized = true;
+    var form = el('pc-form');
+    if (!form) return;
+
+    ['pc-salary', 'pc-frequency', 'pc-state', 'pc-filing-status'].forEach(function (id) {
+      var node = el(id);
+      if (!node) return;
+      node.addEventListener('input', calculate);
+      node.addEventListener('change', calculate);
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      calculate();
+    });
+
+    var reset = el('pc-reset-btn');
+    if (reset) reset.addEventListener('click', function () {
+      if (el('pc-salary')) el('pc-salary').value = '';
+      if (el('pc-frequency')) el('pc-frequency').value = 'biweekly';
+      if (el('pc-filing-status')) el('pc-filing-status').value = 'single';
+      if (el('pc-state')) el('pc-state').value = 'TX';
+      var ledger = el('pc-ledger');
+      if (ledger) ledger.hidden = true;
+    });
+
+    var copy = el('pc-copy-btn');
+    if (copy) copy.addEventListener('click', function () {
+      var r = window.__lastPaycheckResult;
+      if (!r || !window.copyToClipboard) return;
+      var t = r.totals;
+      var text = [
+        'US Salary Tools — 2026 Paycheck Estimate',
+        'Annual Gross: ' + money(r.grossAnnual),
+        'Annual Net: ' + money(t.netAnnual),
+        'Monthly Net: ' + money(t.netMonthly),
+        'Biweekly Net: ' + money(t.netBiweekly),
+        'Effective Tax Rate: ' + percent(t.effectiveTaxRate)
+      ].join('\n');
+      window.copyToClipboard(text);
+    });
+
+    calculate();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
