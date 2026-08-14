@@ -1,68 +1,37 @@
-import { formatCurrency } from "./tax-engine/formatting.js";
-import { sanitizeInputs, validateInputs } from "./tax-engine/validation.js";
-function getElements(){
-  return {
-    annualInput: document.getElementById("annualSalary") || document.querySelector("[data-annual-salary]"),
-    hourlyInput: document.getElementById("hourlyRate"),
-    hoursPerWeek: document.getElementById("hoursPerWeek"),
-    weeksPerYear: document.getElementById("weeksPerYear"),
-    payFrequency: document.getElementById("payFrequency"),
-    resultAnnual: document.getElementById("resultAnnual"),
-    resultMonthly: document.getElementById("resultMonthly"),
-    resultBiweekly: document.getElementById("resultBiweekly"),
-    resultWeekly: document.getElementById("resultWeekly"),
-    resultDaily: document.getElementById("resultDaily"),
-    resultHourly: document.getElementById("resultHourly"),
-  };
-}
-function calculate(){
-  const els=getElements();
-  if (!els.annualInput && !els.hourlyInput) return;
-  const raw={
-    grossAnnual: els.annualInput?els.annualInput.value:0,
-    hourlyRate: els.hourlyInput?els.hourlyInput.value:0,
-    hoursPerWeek: els.hoursPerWeek?els.hoursPerWeek.value:40,
-    weeksPerYear: els.weeksPerYear?els.weeksPerYear.value:52,
-    payFrequency: els.payFrequency?els.payFrequency.value:"annual"
-  };
-  const sanitized=sanitizeInputs(raw);
-  const validation=validateInputs(sanitized);
-  if (!validation.valid){
-    if (els.resultAnnual) els.resultAnnual.textContent="Enter your salary to estimate your take-home pay.";
-    return;
+// Salary calculator page logic. Loaded as a classic <script>.
+(function () {
+  function el(id) { return document.getElementById(id); }
+  function money(n) { return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(Number(n)||0); }
+  function num(id,fallback){var v=el(id)?el(id).value:'';var n=parseFloat(String(v).replace(/[$,\s]/g,''));return Number.isFinite(n)?n:fallback;}
+  function hourlyMode(){var g=el('field-hourly');return !!(g&&!g.classList.contains('hidden'));}
+  function calculate(){
+    var annual=Math.max(0,num('salary-annual',0));
+    var hourly=Math.max(0,num('salary-hourly',0));
+    var hours=Math.max(0,num('salary-hours',40));
+    var weeks=Math.max(0,Math.min(52,num('salary-weeks',52)));
+    if(hourlyMode()) annual=hourly*hours*weeks;
+    var totalHours=hours*weeks;
+    var v={annually:annual,monthly:annual/12,biweekly:annual/26,weekly:annual/52,daily:weeks>0?annual/(weeks*5):0,hourly:totalHours>0?annual/totalHours:0};
+    if(el('out-annual'))el('out-annual').textContent=money(v.annually);
+    if(el('out-monthly'))el('out-monthly').textContent=money(v.monthly);
+    if(el('out-biweekly'))el('out-biweekly').textContent=money(v.biweekly);
+    if(el('out-weekly'))el('out-weekly').textContent=money(v.weekly);
+    if(el('out-daily'))el('out-daily').textContent=money(v.daily);
+    if(el('out-hourly'))el('out-hourly').textContent=money(v.hourly);
+    if(el('salary-ledger'))el('salary-ledger').hidden=annual<=0;
+    return v;
   }
-  let grossAnnual=sanitized.grossAnnual;
-  if (raw.payFrequency==="hourly" || (els.hourlyInput && els.hourlyInput.value && !els.annualInput.value)){
-    grossAnnual=sanitized.hourlyRate*sanitized.hoursPerWeek*sanitized.weeksPerYear;
-  } else if (raw.payFrequency==="monthly") grossAnnual=sanitized.grossAnnual*12;
-  else if (raw.payFrequency==="semimonthly") grossAnnual=sanitized.grossAnnual*24;
-  else if (raw.payFrequency==="biweekly") grossAnnual=sanitized.grossAnnual*26;
-  else if (raw.payFrequency==="weekly") grossAnnual=sanitized.grossAnnual*52;
-  else if (raw.payFrequency==="daily") grossAnnual=sanitized.grossAnnual*(sanitized.daysPerYear||260);
-  if (grossAnnual===0){
-    if (els.resultAnnual) els.resultAnnual.textContent="Enter your salary to estimate your take-home pay.";
-    return;
+  function setMode(mode){var h=mode==='hourly';if(el('field-annual'))el('field-annual').classList.toggle('hidden',h);if(el('field-hourly'))el('field-hourly').classList.toggle('hidden',!h);if(el('mode-annual-btn'))el('mode-annual-btn').setAttribute('aria-pressed',h?'false':'true');if(el('mode-hourly-btn'))el('mode-hourly-btn').setAttribute('aria-pressed',h?'true':'false');calculate();}
+  function init(){
+    var form=el('salary-form');if(!form)return;
+    if(el('mode-annual-btn'))el('mode-annual-btn').addEventListener('click',function(){setMode('annual')});
+    if(el('mode-hourly-btn'))el('mode-hourly-btn').addEventListener('click',function(){setMode('hourly')});
+    ['salary-annual','salary-hourly','salary-hours','salary-weeks','salary-frequency'].forEach(function(id){if(el(id)){el(id).addEventListener('input',calculate);el(id).addEventListener('change',calculate)}});
+    form.addEventListener('submit',function(e){e.preventDefault();calculate()});
+    if(el('salary-reset-btn'))el('salary-reset-btn').addEventListener('click',function(){if(el('salary-annual'))el('salary-annual').value='';if(el('salary-hourly'))el('salary-hourly').value='';if(el('salary-hours'))el('salary-hours').value='40';if(el('salary-weeks'))el('salary-weeks').value='52';setMode('annual')});
+    if(el('salary-copy-btn'))el('salary-copy-btn').addEventListener('click',function(){var v=calculate();var text=['Annual: '+money(v.annually),'Monthly: '+money(v.monthly),'Biweekly: '+money(v.biweekly),'Weekly: '+money(v.weekly),'Daily: '+money(v.daily),'Hourly: '+money(v.hourly)].join('\n');if(window.copyToClipboard)window.copyToClipboard(text)});
+    document.querySelectorAll('.faq-item__q').forEach(function(q){q.addEventListener('click',function(){var item=q.closest('.faq-item'),open=item&&item.getAttribute('data-open')==='true';if(item)item.setAttribute('data-open',open?'false':'true');q.setAttribute('aria-expanded',open?'false':'true')})});
+    calculate();
   }
-  const hoursPerWeek=sanitized.hoursPerWeek||40;
-  const weeksPerYear=sanitized.weeksPerYear||52;
-  const totalHours=hoursPerWeek*weeksPerYear;
-  const monthly=grossAnnual/12;
-  const semimonthly=grossAnnual/24;
-  const biweekly=grossAnnual/26;
-  const weekly=grossAnnual/52;
-  const daily=grossAnnual/(weeksPerYear*5);
-  const hourly=totalHours>0?grossAnnual/totalHours:0;
-  if (els.resultAnnual) els.resultAnnual.textContent=formatCurrency(grossAnnual);
-  if (els.resultMonthly) els.resultMonthly.textContent=formatCurrency(monthly);
-  if (els.resultBiweekly) els.resultBiweekly.textContent=formatCurrency(biweekly);
-  if (els.resultWeekly) els.resultWeekly.textContent=formatCurrency(weekly);
-  if (els.resultDaily) els.resultDaily.textContent=formatCurrency(daily);
-  if (els.resultHourly) els.resultHourly.textContent=formatCurrency(hourly);
-}
-document.addEventListener("DOMContentLoaded",()=>{
-  const els=getElements();
-  const inputs=[els.annualInput,els.hourlyInput,els.hoursPerWeek,els.weeksPerYear,els.payFrequency].filter(Boolean);
-  inputs.forEach(el=>{el.addEventListener("input",calculate);el.addEventListener("change",calculate);});
-  calculate();
-});
-export {calculate};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
