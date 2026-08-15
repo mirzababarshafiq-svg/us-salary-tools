@@ -1,68 +1,337 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en-US">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="application-version" content="2026.1.0">
-<meta name="description" content="Free 2026 US salary and take-home pay calculator with federal tax, state tax, FICA and deductions.">
-<title>US Salary Tools — 2026</title>
-<style>
-:root{--bg:#f6f8fb;--surface:#fff;--ink:#0e1526;--muted:#5b6b86;--line:#dce3ec;--blue:#2f6bff;--green:#10966f;--green-soft:#e6f8f0;--shadow:0 14px 36px rgba(20,39,78,.08)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit}.shell{min-height:100vh}
-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(220,227,236,.9)}.nav{max-width:1200px;margin:auto;height:64px;padding:0 18px;display:flex;align-items:center;gap:22px}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:18px;font-weight:800;letter-spacing:-.02em}.brandmark{width:30px;height:30px;border-radius:9px;background:#0e1526;display:grid;place-items:center}.brandmark:after{content:"";width:8px;height:8px;border-radius:50%;background:#12a97a;box-shadow:0 0 0 5px rgba(18,167,123,.1)}.links{display:flex;align-items:center;gap:4px;margin-left:auto}.navitem{position:relative}.navbtn{display:flex;align-items:center;gap:5px;border:0;background:transparent;color:#3a4a67;font:600 13px/1 inherit;padding:10px 11px;border-radius:10px;cursor:pointer;text-decoration:none}.navbtn:hover,.navbtn.open{background:#f5f7fb;color:var(--ink)}.chev{font-size:11px;opacity:.65}.navbtn.open .chev{transform:rotate(180deg)}.dropdown{position:absolute;top:calc(100% + 6px);left:0;min-width:230px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:none}.dropdown.show{display:block}.drop{display:block;text-decoration:none;padding:10px 12px;border-radius:9px;font-size:13px;color:var(--ink)}.drop:hover{background:#f6f8fb}.version{margin-left:10px;font-size:11px;font-weight:800;color:#0b6b4f;background:var(--green-soft);border:1px solid #b7ead7;padding:6px 9px;border-radius:999px;white-space:nowrap}.navcta{margin-left:4px;text-decoration:none;background:var(--blue);color:#fff;font-weight:800;font-size:13px;padding:10px 15px;border-radius:999px}.mobile{display:none;margin-left:auto;border:0;background:transparent;color:var(--ink);font-size:22px}
-.wrap{max-width:1200px;margin:auto;padding:42px 18px 80px}.hero{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}.copy{padding:34px 0 0 8px}.badge{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;border:1px solid #9fc0ff;background:#f0f6ff;color:#2960d6;font-weight:800;font-size:11px;letter-spacing:.04em}.badge .dot{width:6px;height:6px;border-radius:50%;background:#2f6bff}.copy h1{font-size:54px;line-height:1.04;letter-spacing:-.055em;margin:18px 0 16px;max-width:600px}.copy p{font-size:17px;line-height:1.58;color:var(--muted);max-width:600px;margin:0}.meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px;font-size:12px;color:#6d7d98}.meta span{position:relative;padding-right:12px}.meta span:not(:last-child):after{content:"•";position:absolute;right:0;color:#a5b1c1}.features{display:grid;gap:14px;margin-top:30px;max-width:540px}.feature{display:flex;gap:12px;align-items:flex-start}.fico{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:10px;display:grid;place-items:center;font-size:15px;flex:0 0 auto}.feature b{display:block;font-size:13px;margin:2px 0 3px}.feature span{font-size:12px;color:var(--muted)}
-.calc{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}.calc-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.calc-title{display:flex;gap:10px;align-items:center}.calcicon{width:28px;height:28px;border-radius:8px;background:#101725;color:#fff;display:grid;place-items:center;font-size:13px}.calc-title b{font-size:13px}.calc-title small{display:block;color:#8190a6;font-size:10px;margin-top:2px}.year{font-size:10px;font-weight:800;background:#f2f5fa;padding:7px 10px;border-radius:999px;color:#496078}.reset{border:0;background:transparent;color:#6e7d92;font-size:11px;cursor:pointer;margin-left:10px}.form{padding:18px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:14px}.field label{display:block;font-size:10px;font-weight:800;color:#72809a;letter-spacing:.05em;text-transform:uppercase;margin:0 0 7px}.input,.select{width:100%;height:44px;border:1px solid #d5dde8;background:#fff;border-radius:10px;padding:0 12px;font:600 14px inherit;color:var(--ink);outline:none}.input:focus,.select:focus{border-color:#96b5ff;box-shadow:0 0 0 3px rgba(47,107,255,.1)}.paytype{display:inline-flex;background:#edf1f7;border-radius:999px;padding:3px;margin-bottom:15px}.paytype button{border:0;background:transparent;padding:9px 14px;border-radius:999px;font-weight:800;font-size:12px;color:#586a85;cursor:pointer}.paytype button.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(14,21,38,.08)}.advanced{border:1px solid var(--line);background:#f8fafc;border-radius:11px;margin-top:3px}.advanced button{width:100%;border:0;background:transparent;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:12px;cursor:pointer}.advbody{display:none;padding:0 12px 12px}.advbody.show{display:block}.mini{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini label{font-size:10px;font-weight:700;color:#72809a;display:block;margin-bottom:6px}.mini .input{height:38px;font-size:12px}.calcresult{border-top:1px solid var(--line);padding:18px;background:linear-gradient(#fff,#fbfcfe)}.estimate{display:inline-flex;align-items:center;gap:6px;color:#0b7f5e;background:var(--green-soft);border:1px solid #b6ead8;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800}.enginepill{display:inline-flex;margin-left:6px;background:#f3f6fb;border:1px solid #dce4ef;color:#61728c;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800}.netlabel{margin-top:13px;color:#6e7e95;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}.net{font-size:55px;line-height:1;font-weight:900;letter-spacing:-.05em;color:#13906b;margin-top:4px}.netsub{color:#61728a;font-size:13px;margin-top:6px}.switch{display:flex;gap:3px;background:#edf1f7;padding:3px;border-radius:999px;margin-top:16px;overflow:auto}.switch button{border:0;background:transparent;color:#5a6b85;font-weight:800;font-size:10px;padding:8px 10px;border-radius:999px;cursor:pointer;white-space:nowrap}.switch button.active{background:#101725;color:#fff}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px}.metric{border:1px solid var(--line);background:#fff;border-radius:11px;padding:11px}.metric .lab{font-size:9px;color:#7b8aa0;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.metric .val{font-size:14px;font-weight:900;margin-top:5px}.bar{height:5px;background:#edf1f6;border-radius:999px;margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:#9eb0c9;border-radius:999px}.small{font-size:9px;color:#7b8aa0;margin-top:5px}.detail{margin-top:15px;border-top:1px solid var(--line);padding-top:13px}.detail h3{font-size:11px;margin:0 0 9px}.break{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:11px;color:#5f718b}.break b{color:var(--ink)}.error{color:#a33b3b;background:#fff0f0;border:1px solid #f1c3c3;padding:8px 10px;border-radius:9px;font-size:11px;margin-top:10px;display:none}.error.show{display:block}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none}.card h3{margin:0 0 7px;color:var(--ink);font-size:15px}.card p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
-@media(max-width:900px){.hero{grid-template-columns:1fr}.copy{padding-top:5px}.copy h1{font-size:44px}.navcta{display:none}.version{margin-left:auto}.links{margin-left:0}.nav{gap:10px}}@media(max-width:620px){.nav{height:56px;padding:0 10px}.brand{font-size:16px}.links .navitem:nth-child(2),.links .navitem:nth-child(3),.links .navitem:nth-child(4){display:none}.copy h1{font-size:37px}.row2,.mini,.metrics,.cards{grid-template-columns:1fr}.wrap{padding-top:25px}.navbtn{padding:8px 7px}.version{font-size:9px}.copy{padding-left:0}}
-</style>
-</head>
-<body><div class="shell">
-<header><div class="nav"><a class="brand" href="/"><span class="brandmark"></span><span>TakeHome</span></a><nav class="links" aria-label="Primary navigation">
-<div class="navitem"><button class="navbtn" type="button">Calculators <span class="chev">⌄</span></button><div class="dropdown"><a class="drop" href="/salary-calculator.html">Salary Calculator</a><a class="drop" href="/paycheck-calculator.html">Paycheck Calculator</a><a class="drop" href="/hourly-to-salary.html">Hourly ↔ Salary</a><a class="drop" href="/overtime-calculator.html">Overtime Calculator</a><a class="drop" href="/bonus-tax-calculator.html">Bonus Tax Calculator</a></div></div>
-<div class="navitem"><button class="navbtn" type="button">States <span class="chev">⌄</span></button><div class="dropdown"><a class="drop" href="/states/california.html">California</a><a class="drop" href="/states/texas.html">Texas</a><a class="drop" href="/states/new-york.html">New York</a><a class="drop" href="/states/florida.html">Florida</a><a class="drop" href="/states/washington.html">Washington</a></div></div>
-<div class="navitem"><button class="navbtn" type="button">Resources <span class="chev">⌄</span></button><div class="dropdown"><a class="drop" href="/withholding.html">W-4 &amp; Withholding</a><a class="drop" href="/state-taxes.html">State taxes</a><a class="drop" href="/retirement.html">Retirement</a><a class="drop" href="/methodology.html">Methodology</a></div></div>
-<div class="navitem"><a class="navbtn" href="/about.html">About</a></div></nav><div class="version">Engine v2026.1.0</div><a class="navcta" href="#calculator">Calculate My Pay</a><button class="mobile" id="mobileBtn" type="button">☰</button></div></header>
-<main class="wrap"><section class="hero"><div class="copy"><span class="badge"><span class="dot"></span> 2026 TAX TABLES LIVE</span><h1>Calculate Your<br>Take-Home Pay<br>With Confidence</h1><p>See exactly what lands in your bank account after federal tax, state tax, Social Security, Medicare, 401(k), and other deductions — for all 50 states, updated for 2026.</p><div class="meta"><span>2026 tax tables</span><span>All 50 states</span><span>Free</span><span>Nothing stored</span></div><div class="features"><div class="feature"><div class="fico">▦</div><div><b>Enter your pay</b><span>Salary or hourly, state and filing status — instantly.</span></div></div><div class="feature"><div class="fico">◫</div><div><b>See the breakdown</b><span>Federal, FICA, state, deductions and take-home pay.</span></div></div><div class="feature"><div class="fico">♢</div><div><b>Trust the number</b><span>Sources cited, methodology open, always labelled estimate.</span></div></div></div></div>
-<div class="calc" id="calculator"><div class="calc-head"><div class="calc-title"><span class="calcicon">▣</span><div><b>Paycheck Calculator</b><small>Example — edit any field</small></div></div><div><span class="year">Tax year 2026</span><button class="reset" id="reset" type="button">Reset</button></div></div>
-<div class="form"><div class="paytype"><button id="salaryMode" class="active" type="button">Salary</button><button id="hourlyMode" type="button">Hourly</button></div>
-<div id="salaryFields"><div class="row2"><div class="field"><label>Annual Salary</label><input id="salary" class="input" type="number" min="0" step="500" value="75000"></div><div class="field"><label>Pay Frequency</label><select id="freq" class="select"><option value="biweekly">Biweekly</option><option value="weekly">Weekly</option><option value="semimonthly">Semimonthly</option><option value="monthly">Monthly</option><option value="annual">Annual</option><option value="daily">Daily</option></select></div></div></div>
-<div id="hourlyFields" style="display:none"><div class="row2"><div class="field"><label>Hourly Rate</label><input id="hourly" class="input" type="number" min="0" step="0.25" value="36.06"></div><div class="field"><label>Hours Per Week</label><input id="hours" class="input" type="number" min="0" max="168" value="40"></div></div><div class="row2"><div class="field"><label>Weeks Per Year</label><input id="weeks" class="input" type="number" min="0" max="52" value="52"></div><div class="field"><label>Pay Frequency</label><select id="freqHourly" class="select"><option value="biweekly">Biweekly</option><option value="weekly">Weekly</option><option value="semimonthly">Semimonthly</option><option value="monthly">Monthly</option><option value="annual">Annual</option></select></div></div></div>
-<div class="row2"><div class="field"><label>State</label><select id="state" class="select"><option value="TX">Texas</option><option value="CA">California</option><option value="NY">New York</option><option value="FL">Florida</option><option value="WA">Washington</option><option value="NJ">New Jersey</option><option value="IL">Illinois</option><option value="PA">Pennsylvania</option><option value="NC">North Carolina</option><option value="AZ">Arizona</option><option value="CO">Colorado</option><option value="MA">Massachusetts</option><option value="GA">Georgia</option><option value="VA">Virginia</option><option value="OH">Ohio</option><option value="TN">Tennessee</option><option value="NV">Nevada</option><option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AR">Arkansas</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NH">New Hampshire</option><option value="NM">New Mexico</option><option value="ND">North Dakota</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option><option value="DC">District of Columbia</option></select></div><div class="field"><label>Filing Status</label><select id="filing" class="select"><option value="single">Single</option><option value="marriedJointly">Married Filing Jointly</option><option value="marriedSeparately">Married Filing Separately</option><option value="headOfHousehold">Head of Household</option></select></div></div>
-<div class="advanced"><button id="advancedBtn" type="button"><span>⌄ &nbsp;Advanced options</span><span id="activeCount">0 active</span></button><div class="advbody" id="advbody"><div class="mini"><div><label>401(k) pre-tax %</label><input id="k401" class="input" type="number" min="0" max="100" step="0.5" value="0"></div><div><label>Health premium / year</label><input id="health" class="input" type="number" min="0" value="0"></div></div></div></div><div class="error" id="error"></div></div>
-<div class="calcresult"><span class="estimate">● Estimate</span><span class="enginepill">Tax year 2026 · v2026.1.0</span><div class="netlabel">Estimated take-home pay</div><div class="net" id="net">$4,925</div><div class="netsub" id="annualNet">$59,100 per year · 78.8% take-home</div>
-<div class="switch"><button class="active" data-period="monthly">Monthly</button><button data-period="annual">Annual</button><button data-period="semimonthly">Semimonthly</button><button data-period="biweekly">Biweekly</button><button data-period="weekly">Weekly</button><button data-period="daily">Daily</button><button data-period="hourly">Hourly</button></div>
-<div class="metrics"><div class="metric"><div class="lab">Gross Pay</div><div class="val" id="grossMetric">$6,250</div><div class="bar"><i style="width:100%"></i></div><div class="small" id="grossSub">$75,000/yr</div></div><div class="metric"><div class="lab">Total Taxes</div><div class="val" id="taxMetric">$1,300</div><div class="bar"><i id="taxBar" style="width:21.2%"></i></div><div class="small" id="taxSub">21.2% effective</div></div><div class="metric"><div class="lab">Take-home %</div><div class="val" id="takeMetric">78.8%</div><div class="bar"><i id="takeBar" style="width:78.8%"></i></div><div class="small">of gross</div></div></div><div class="detail"><h3>Where your money goes</h3><div class="break"><span>Federal income tax</span><b id="fed">$8,770</b><span>Social Security</span><b id="ss">$4,650</b><span>Medicare</span><b id="med">$1,088</b><span>State income tax</span><b id="st">$0</b><span>Pre-tax deductions</span><b id="pretax">$0</b></div></div></div></div></section></main>
-</div>
-<script>
-(function(){
-'use strict';
-const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Math.max(0,Number(n)||0));
-let mode='salary',period='monthly';
-const FED={single:[12400,50400,105700,201775,256225,640600],marriedJointly:[24800,100800,211400,403550,512450,768700],marriedSeparately:[12400,50400,105700,201775,256225,384350],headOfHousehold:[17700,67450,105700,201775,256200,640600]};
-const RATE=[.10,.12,.22,.24,.32,.35,.37];
-const STATE_FLAT={AZ:.025,CO:.044,IL:.049,IN:.03,MA:.05,MI:.0425,MS:.044,NC:.045,PA:.0307,UT:.0465};
-const STATE_NONE=new Set(['AK','FL','NV','SD','TN','TX','WA','WY']);
-const SIMPLE_STATE={AL:.05,AR:.039,CA:.093,CT:.055,DE:.0555,GA:.05,HI:.07,ID:.058,IA:.057,KS:.054, KY:.04,LA:.03,ME:.055,MD:.05,MN:.07,MO:.04,MT:.06,NE:.05,NH:0,NJ:.055,NM:.05,NY:.06,ND:.029,OH:.035,OK:.045,OR:.075,RI:.04,SC:.07,VT:.06,VA:.05,WV:.05,WI:.05};
-function progressive(taxable,br){let tax=0,last=0;for(let i=0;i<br.length;i++){let top=br[i],r=RATE[i];if(taxable<=last)break;let amt=Math.min(taxable,top)-last;if(amt>0)tax+=amt*r;last=top}if(taxable>last)tax+=(taxable-last)*RATE[RATE.length-1];return tax}
-function federalTax(taxable,filing){return progressive(Math.max(0,taxable),FED[filing]||FED.single)}
-function stateTax(gross,state,filing,pretax){if(STATE_NONE.has(state))return 0;let t=Math.max(0,gross-pretax);if(STATE_FLAT[state])return t*STATE_FLAT[state];let rate=SIMPLE_STATE[state]??.045;let std=filing==='marriedJointly'?12000:filing==='headOfHousehold'?9000:6000;return Math.max(0,t-std)*rate}
-function calculate(){
- try{
-  $('error').classList.remove('show');
-  let gross=mode==='salary'?Number($('salary').value||0):Number($('hourly').value||0)*Number($('hours').value||40)*Number($('weeks').value||52);
-  const filing=$('filing').value,state=$('state').value,kPct=Math.max(0,Number($('k401').value)||0),health=Math.max(0,Number($('health').value)||0),pretax=Math.min(gross,gross*kPct/100+health);
-  const taxableFed=Math.max(0,gross-pretax-(filing==='marriedJointly'?32200:filing==='headOfHousehold'?24150:16100));
-  const fed=federalTax(taxableFed,filing);const ss=Math.min(gross-pretax,184500)*.062;const addMedThreshold=filing==='marriedJointly'?250000:filing==='marriedSeparately'?125000:200000;const med=Math.max(0,gross-pretax)*.0145+Math.max(0,(gross-pretax-addMedThreshold))*.009;const st=stateTax(gross,state,filing,pretax);const total=fed+ss+med+st;const net=Math.max(0,gross-total-pretax);const map={annual:net,monthly:net/12,semimonthly:net/24,biweekly:net/26,weekly:net/52,daily:net/260,hourly:gross/2080?net/2080:0};const gmap={annual:gross,monthly:gross/12,semimonthly:gross/24,biweekly:gross/26,weekly:gross/52,daily:gross/260,hourly:gross/2080};
-  $('net').textContent=money(map[period]);$('annualNet').textContent=`${money(net)} per year · ${(gross?net/gross*100:0).toFixed(1)}% take-home`;$('grossMetric').textContent=money(gmap[period]);$('grossSub').textContent=`${money(gross)}/yr`;$('taxMetric').textContent=money(total);$('taxSub').textContent=`${(gross?total/gross*100:0).toFixed(1)}% effective`;$('takeMetric').textContent=`${(gross?net/gross*100:0).toFixed(1)}%`;$('taxBar').style.width=Math.min(100,gross?total/gross*100:0)+'%';$('takeBar').style.width=Math.min(100,gross?net/gross*100:0)+'%';$('fed').textContent=money(fed);$('ss').textContent=money(ss);$('med').textContent=money(med);$('st').textContent=money(st);$('pretax').textContent=money(pretax);$('activeCount').textContent=((kPct>0?1:0)+(health>0?1:0))+' active';
- }catch(e){$('error').textContent=e.message||'Unable to calculate';$('error').classList.add('show')}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Salary Tools — Free Paycheck, Salary & Hourly Calculators (2026)</title>
+<meta name="description" content="Free 2026 salary, paycheck, hourly, overtime, and raise calculators for all 50 states. No sign-up, nothing stored, estimates you can trust.">
+<link rel="canonical" href="https://ussalarytools.com/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="US Salary Tools">
+<meta property="og:title" content="US Salary Tools — Free Paycheck, Salary & Hourly Calculators (2026)">
+<meta property="og:description" content="Free 2026 salary, paycheck, hourly, overtime, and raise calculators for all 50 states. No sign-up, nothing stored, estimates you can trust.">
+<meta property="og:url" content="https://ussalarytools.com/">
+<meta property="og:image" content="https://ussalarytools.com/assets/og-image.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="US Salary Tools — Free Paycheck, Salary & Hourly Calculators (2026)">
+<meta name="twitter:description" content="Free 2026 salary, paycheck, hourly, overtime, and raise calculators for all 50 states. No sign-up, nothing stored, estimates you can trust.">
+<meta name="twitter:image" content="https://ussalarytools.com/assets/og-image.png">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/css/style.css?v=2026.1.0">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "US Salary Tools",
+  "url": "https://ussalarytools.com/"
 }
-function modeSwitch(next){mode=next;$('salaryMode').classList.toggle('active',next==='salary');$('hourlyMode').classList.toggle('active',next==='hourly');$('salaryFields').style.display=next==='salary'?'block':'none';$('hourlyFields').style.display=next==='hourly'?'block':'none';calculate()}
-$('salaryMode').addEventListener('click',()=>modeSwitch('salary'));$('hourlyMode').addEventListener('click',()=>modeSwitch('hourly'));$('advancedBtn').addEventListener('click',()=>$('advbody').classList.toggle('show'));$('reset').addEventListener('click',()=>{location.reload()});
-Array.from(document.querySelectorAll('input,select')).forEach(el=>{el.addEventListener('input',calculate);el.addEventListener('change',calculate)});Array.from(document.querySelectorAll('[data-period]')).forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-period]').forEach(x=>x.classList.remove('active'));b.classList.add('active');period=b.dataset.period;calculate()}));
-document.querySelectorAll('.navbtn').forEach(btn=>btn.addEventListener('click',function(e){e.stopPropagation();const dd=this.parentElement.querySelector('.dropdown');const opening=!dd.classList.contains('show');document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('show'));document.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('open'));if(opening){dd.classList.add('show');this.classList.add('open')}}));document.addEventListener('click',()=>{document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('show'));document.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('open'))});
-$('mobileBtn').addEventListener('click',()=>{document.querySelector('.links').style.display=document.querySelector('.links').style.display==='flex'?'none':'flex'});
-calculate();
-})();
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Paycheck Calculator",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any (web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "url": "https://ussalarytools.com/"
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="/" class="brand">
+      <svg class="brand__mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="3" width="26" height="26" rx="7" fill="#B87F26"/>
+        <path d="M10 22V10h3.6c2.3 0 3.7 1.3 3.7 3.3 0 1.6-1 2.7-2.3 3l2.7 5.7h-2.4l-2.4-5.2h-.9V22H10Zm2-6.9h1.3c1.1 0 1.7-.6 1.7-1.6 0-1-.6-1.5-1.7-1.5H12v3.1Z" fill="#0B2545"/>
+      </svg>
+      US Salary Tools
+    </a>
+
+    <nav class="nav-desktop" aria-label="Primary">
+      <a href="/" aria-current="page">Home</a>
+      <div class="nav-dropdown" data-open="false">
+        <button class="nav-dropdown__trigger" aria-expanded="false" aria-haspopup="true">
+          Calculators
+          <svg class="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="nav-dropdown__panel">
+          <a href="/salary-calculator.html">Salary Calculator</a>
+          <a href="/hourly-to-salary.html">Hourly to Salary</a>
+          <a href="/salary-to-hourly.html">Salary to Hourly</a>
+          <a href="/overtime-calculator.html">Overtime Calculator</a>
+          <a href="/paycheck-calculator.html">Paycheck Calculator</a>
+          <a href="/raise-calculator.html">Raise Calculator</a>
+        </div>
+      </div>
+      <a href="/about.html">About</a>
+      <a href="/methodology.html">Methodology</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+
+    <button class="nav-toggle" aria-expanded="false" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <nav class="nav-mobile" data-open="false" aria-label="Mobile">
+    <ul class="nav-mobile__list">
+      <li><a href="/" aria-current="page">Home</a></li>
+      <li><a href="/salary-calculator.html">Salary Calculator</a></li>
+      <li><a href="/hourly-to-salary.html">Hourly to Salary</a></li>
+      <li><a href="/salary-to-hourly.html">Salary to Hourly</a></li>
+      <li><a href="/overtime-calculator.html">Overtime Calculator</a></li>
+      <li><a href="/paycheck-calculator.html">Paycheck Calculator</a></li>
+      <li><a href="/raise-calculator.html">Raise Calculator</a></li>
+      <li><a href="/about.html">About</a></li>
+      <li><a href="/methodology.html">Methodology</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow" style="color:#E7ECF3;">2026 Tax Tables Live</span>
+      <h1>Calculate your take-home pay with confidence</h1>
+      <p class="lede">See exactly what lands in your bank account after federal tax, state tax, Social Security, and Medicare — for all 50 states, updated for 2026.</p>
+      <div class="hero__badges">
+        <span class="hero__badge">2026 tax tables</span>
+        <span class="hero__badge">All 50 states</span>
+        <span class="hero__badge">Free</span>
+        <span class="hero__badge">No sign-up</span>
+        <span class="hero__badge">Nothing stored</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <span class="eyebrow">Free Tool · Tax Year 2026</span>
+      <h2>Paycheck Calculator</h2>
+      <p class="text-muted max-w-prose mb-5">Enter your salary, pay frequency, state, and filing status to estimate your take-home pay.</p>
+
+      <div class="card card--calculator" id="paycheck-calculator">
+        <div class="callout mb-5">
+          <strong>This is an ESTIMATE, not a paycheck guarantee.</strong> It uses 2026 federal tax brackets, standard FICA rates, and an approximate state tax rate. It does not account for dependents, credits, pre-tax deductions (401(k), health insurance), or local taxes. See the full assumptions on our <a class="link" href="/methodology.html">Methodology</a> page.
+        </div>
+
+        <form id="pc-form" novalidate>
+          <div class="form-grid form-grid--2col">
+            <div class="input-group">
+              <label for="pc-salary">Annual Salary (Gross)</label>
+              <div class="input-wrap">
+                <span class="input-wrap__prefix">$</span>
+                <input type="text" inputmode="decimal" id="pc-salary" class="has-prefix" placeholder="75,000" aria-describedby="err-pc-salary">
+              </div>
+              <p class="helper-text">Your gross yearly pay before taxes.</p>
+              <p class="field-error" id="err-pc-salary" role="alert"></p>
+            </div>
+
+            <div class="input-group">
+              <label for="pc-frequency">Pay Frequency</label>
+              <select id="pc-frequency">
+                <option value="weekly">Weekly</option>
+                <option value="biweekly" selected>Biweekly (every 2 weeks)</option>
+                <option value="semimonthly">Semimonthly (twice a month)</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="pc-state">State</label>
+              <select id="pc-state" aria-describedby="pc-state-note"></select>
+            </div>
+
+            <div class="input-group">
+              <label for="pc-filing-status">Filing Status</label>
+              <select id="pc-filing-status">
+                <option value="single" selected>Single</option>
+                <option value="marriedJointly">Married Filing Jointly</option>
+                <option value="headOfHousehold">Head of Household</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="pc-calculate-btn">Calculate</button>
+            <button type="button" class="btn btn-secondary" id="pc-reset-btn">Reset</button>
+          </div>
+        </form>
+
+        <div class="ledger" id="pc-ledger" hidden>
+          <div class="ledger__tear"></div>
+          <div class="ledger__head">
+            <span class="ledger__head-title">Your Paycheck Estimate</span>
+            <span class="badge badge-estimate">Estimate</span>
+          </div>
+          <div class="ledger__body">
+            <div class="ledger__row"><span class="ledger__label">Gross Pay (per period)</span><span class="ledger__value" id="out-pc-gross">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">Federal Income Tax (est.)</span><span class="ledger__value" id="out-pc-federal">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">State Income Tax (est.)</span><span class="ledger__value" id="out-pc-state">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">FICA (SS + Medicare)</span><span class="ledger__value" id="out-pc-fica">—</span></div>
+            <div class="ledger__row ledger__row--primary"><span class="ledger__label">Net Pay (est.)</span><span class="ledger__value" id="out-pc-net">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">Annual Gross</span><span class="ledger__value" id="out-pc-annual-gross">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">Annual Net (est.)</span><span class="ledger__value" id="out-pc-annual-net">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">Effective Tax Rate</span><span class="ledger__value" id="out-pc-effective-rate">—</span></div>
+          </div>
+          <div class="ledger__footer" style="flex-direction:column;align-items:flex-start;">
+            <button type="button" class="btn btn-ghost" id="pc-copy-btn">Copy Results</button>
+            <p id="pc-state-note" class="text-muted" style="font-size:0.8rem;margin:0;"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-muted mt-4" style="font-size:0.85rem;">Want your gross-pay breakdown instead? Try the <a class="link" href="/salary-calculator.html">Salary Calculator</a>.</p>
+    </div>
+  </section>
+
+  <section class="section-alt">
+    <div class="container">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps, fifteen seconds</h2>
+      <div class="steps mt-5" style="max-width:640px;">
+        <div class="step">
+          <span class="step__num"></span>
+          <div>
+            <h3>Enter your pay</h3>
+            <p>Salary or hourly, state, and filing status.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step__num"></span>
+          <div>
+            <h3>See the breakdown</h3>
+            <p>Federal, state, and FICA — every dollar explained.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step__num"></span>
+          <div>
+            <h3>Trust the number</h3>
+            <p>Sources cited, methodology open, always labelled an estimate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <span class="eyebrow">Browse</span>
+      <h2>All calculators</h2>
+      <div class="grid grid--3 mt-5">
+        <a class="calc-tile" href="/salary-calculator.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <h3>Salary Calculator</h3>
+          <p>Break your annual salary down by pay period.</p>
+        </a>
+        <a class="calc-tile" href="/paycheck-calculator.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.6"/></svg>
+          <h3>Paycheck Calculator</h3>
+          <p>Estimate take-home pay after federal, state, and FICA taxes.</p>
+        </a>
+        <a class="calc-tile" href="/hourly-to-salary.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <h3>Hourly to Salary</h3>
+          <p>Turn an hourly wage into an annual figure.</p>
+        </a>
+        <a class="calc-tile" href="/salary-to-hourly.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7h10M7 12h10M7 17h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <h3>Salary to Hourly</h3>
+          <p>Convert an annual salary into an hourly rate.</p>
+        </a>
+        <a class="calc-tile" href="/overtime-calculator.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>
+          <h3>Overtime Calculator</h3>
+          <p>Calculate overtime pay at 1.5x or a custom multiplier.</p>
+        </a>
+        <a class="calc-tile" href="/raise-calculator.html">
+          <svg class="calc-tile__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>Raise Calculator</h3>
+          <p>See what a raise or new offer means for your paycheck.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="callout callout--error"><strong>Not tax advice:</strong> This site is for informational and educational purposes only and does not constitute tax, legal, or financial advice. US Salary Tools is not affiliated with the IRS or any government agency. Read our full <a class="link" href="/disclaimer.html">Disclaimer</a>.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand" style="color:#fff;">US Salary Tools</a>
+        <p>Free, fast, privacy-first calculators for salary, hourly pay, overtime, raises, and paycheck estimates — built for U.S. workers.</p>
+      </div>
+      <div>
+        <h4>Calculators</h4>
+        <ul>
+          <li><a href="/salary-calculator.html">Salary Calculator</a></li>
+          <li><a href="/hourly-to-salary.html">Hourly to Salary</a></li>
+          <li><a href="/salary-to-hourly.html">Salary to Hourly</a></li>
+          <li><a href="/overtime-calculator.html">Overtime Calculator</a></li>
+          <li><a href="/paycheck-calculator.html">Paycheck Calculator</a></li>
+          <li><a href="/raise-calculator.html">Raise Calculator</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about.html">About</a></li>
+          <li><a href="/methodology.html">Methodology</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Use</a></li>
+          <li><a href="/disclaimer.html">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer-disclaimer">US Salary Tools is an independent resource and is not affiliated with the IRS, Social Security Administration, or any U.S. government agency. All calculators provide estimates for informational purposes only and should not be treated as financial, tax, or legal advice.</p>
+
+    <div class="footer-bottom">
+      <span>© <span class="current-year"></span> US Salary Tools. All rights reserved.</span>
+      <span>Made for U.S. workers, freelancers, and job seekers.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="cookie-banner" data-visible="false">
+  <p>We use cookies for basic analytics and to support free ads that keep this site free. See our <a href="/privacy-policy.html" class="link" style="color:#fff;">Privacy Policy</a>.</p>
+  <div class="cookie-banner__actions">
+    <button type="button" class="btn btn-secondary" data-consent="declined" style="color:#fff;border-color:rgba(255,255,255,0.3);">Decline</button>
+    <button type="button" class="btn btn-gold" data-consent="accepted">Accept</button>
+  </div>
+</div>
+
+<noscript>
+  <div style="background:#FBEAE9;color:#7A241E;padding:16px;text-align:center;">This site's calculators require JavaScript to run. Please enable JavaScript in your browser to use them.</div>
+</noscript>
+<script src="/js/utils.js?v=2026.1.0"></script>
+<script src="/js/main.js?v=2026.1.0"></script>
+<script src="/js/paycheck.js?v=2026.1.0"></script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3359fed1fd644e00a185d00270fbf781"}'></script><!-- End Cloudflare Web Analytics -->
-</body></html>
+</body>
+</html>
