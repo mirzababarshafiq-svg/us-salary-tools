@@ -38,7 +38,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdro
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Math.max(0,Number(n)||0));
 let mode='salary',period='monthly';
-const FED={single:[12400,50400,105700,201775,256225,640600],marriedJointly:[24800,100800,211400,403550,512450,768700],marriedSeparately:[12400,50400,105700,201775,256225,384350],headOfHousehold:[17700,67400,100500,192150,251600,628300]};
+const FED={single:[12400,50400,105700,201775,256225,640600],marriedJointly:[24800,100800,211400,403550,512450,768700],marriedSeparately:[12400,50400,105700,201775,256225,384350],headOfHousehold:[17700,67450,105700,201775,256200,640600]};
 const RATE=[.10,.12,.22,.24,.32,.35,.37];
 const STATE_FLAT={AZ:.025,CO:.044,IL:.049,IN:.03,MA:.05,MI:.0425,MS:.044,NC:.045,PA:.0307,UT:.0465};
 const STATE_NONE=new Set(['AK','FL','NV','SD','TN','TX','WA','WY']);
@@ -52,7 +52,7 @@ function calculate(){
   let gross=mode==='salary'?Number($('salary').value||0):Number($('hourly').value||0)*Number($('hours').value||40)*Number($('weeks').value||52);
   const filing=$('filing').value,state=$('state').value,kPct=Math.max(0,Number($('k401').value)||0),health=Math.max(0,Number($('health').value)||0),pretax=Math.min(gross,gross*kPct/100+health);
   const taxableFed=Math.max(0,gross-pretax-(filing==='marriedJointly'?32200:filing==='headOfHousehold'?24150:16100));
-  const fed=federalTax(taxableFed,filing);const ss=Math.min(gross-pretax,184500)*.062;const med=Math.max(0,gross-pretax)*.0145+Math.max(0,(gross-pretax-(filing==='marriedJointly'?250000:200000)))*.009;const st=stateTax(gross,state,filing,pretax);const total=fed+ss+med+st;const net=Math.max(0,gross-total-pretax);const map={annual:net,monthly:net/12,semimonthly:net/24,biweekly:net/26,weekly:net/52,daily:net/260,hourly:gross/2080?net/2080:0};const gmap={annual:gross,monthly:gross/12,semimonthly:gross/24,biweekly:gross/26,weekly:gross/52,daily:gross/260,hourly:gross/2080};
+  const fed=federalTax(taxableFed,filing);const ss=Math.min(gross-pretax,184500)*.062;const addMedThreshold=filing==='marriedJointly'?250000:filing==='marriedSeparately'?125000:200000;const med=Math.max(0,gross-pretax)*.0145+Math.max(0,(gross-pretax-addMedThreshold))*.009;const st=stateTax(gross,state,filing,pretax);const total=fed+ss+med+st;const net=Math.max(0,gross-total-pretax);const map={annual:net,monthly:net/12,semimonthly:net/24,biweekly:net/26,weekly:net/52,daily:net/260,hourly:gross/2080?net/2080:0};const gmap={annual:gross,monthly:gross/12,semimonthly:gross/24,biweekly:gross/26,weekly:gross/52,daily:gross/260,hourly:gross/2080};
   $('net').textContent=money(map[period]);$('annualNet').textContent=`${money(net)} per year · ${(gross?net/gross*100:0).toFixed(1)}% take-home`;$('grossMetric').textContent=money(gmap[period]);$('grossSub').textContent=`${money(gross)}/yr`;$('taxMetric').textContent=money(total);$('taxSub').textContent=`${(gross?total/gross*100:0).toFixed(1)}% effective`;$('takeMetric').textContent=`${(gross?net/gross*100:0).toFixed(1)}%`;$('taxBar').style.width=Math.min(100,gross?total/gross*100:0)+'%';$('takeBar').style.width=Math.min(100,gross?net/gross*100:0)+'%';$('fed').textContent=money(fed);$('ss').textContent=money(ss);$('med').textContent=money(med);$('st').textContent=money(st);$('pretax').textContent=money(pretax);$('activeCount').textContent=((kPct>0?1:0)+(health>0?1:0))+' active';
  }catch(e){$('error').textContent=e.message||'Unable to calculate';$('error').classList.add('show')}
 }
@@ -64,4 +64,5 @@ $('mobileBtn').addEventListener('click',()=>{document.querySelector('.links').st
 calculate();
 })();
 </script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3359fed1fd644e00a185d00270fbf781"}'></script><!-- End Cloudflare Web Analytics -->
 </body></html>
