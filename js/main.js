@@ -1,6 +1,42 @@
 /* Shared navigation for all classic calculator pages. */
 (function () {
+  var CONSENT_KEY = 'cookieConsent';
+  var BEACON_TOKEN = '3359fed1fd644e00a185d00270fbf781';
+
+  function loadAnalytics() {
+    if (document.querySelector('script[data-cf-beacon]')) return;
+    var script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+    script.setAttribute('data-cf-beacon', JSON.stringify({ token: BEACON_TOKEN }));
+    document.body.appendChild(script);
+  }
+
+  function initCookieBanner() {
+    var banner = document.querySelector('.cookie-banner');
+    if (!banner) return;
+
+    var saved = null;
+    try { saved = localStorage.getItem(CONSENT_KEY); } catch (e) {}
+
+    if (saved === 'accepted') {
+      loadAnalytics();
+    } else if (saved !== 'declined') {
+      banner.setAttribute('data-visible', 'true');
+    }
+
+    banner.querySelectorAll('[data-consent]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var choice = btn.getAttribute('data-consent');
+        try { localStorage.setItem(CONSENT_KEY, choice); } catch (e) {}
+        banner.setAttribute('data-visible', 'false');
+        if (choice === 'accepted') loadAnalytics();
+      });
+    });
+  }
+
   function initNav() {
+    initCookieBanner();
     var dropdowns = document.querySelectorAll('.nav-dropdown');
     dropdowns.forEach(function (dropdown) {
       var trigger = dropdown.querySelector('.nav-dropdown__trigger');

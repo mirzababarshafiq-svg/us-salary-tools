@@ -61,6 +61,7 @@ export function calculateAll(sanitizedInput){
       totalLocal:localTaxInfo.localIncomeTax,
       totalTaxes:roundCents(totalTaxes),
       totalDeductions:roundCents(totalDeductions),
+      grossAnnual,
       netAnnual,
       netMonthly:roundCents(netAnnual/12),
       netBiweekly:roundCents(netAnnual/26),
