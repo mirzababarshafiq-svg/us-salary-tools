@@ -2,6 +2,48 @@
 (function () {
   var CONSENT_KEY = 'cookieConsent';
   var BEACON_TOKEN = '3359fed1fd644e00a185d00270fbf781';
+  var THEME_KEY = 'theme';
+
+  function getPreferredTheme() {
+    try {
+      var saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'light' || saved === 'dark') return saved;
+    } catch (e) {}
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+    return 'light';
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  // Apply as early as possible (script runs at end of body, after DOM parse)
+  // to minimize the flash of the wrong theme.
+  applyTheme(getPreferredTheme());
+
+  function initThemeToggle() {
+    var headerInner = document.querySelector('.site-header__inner');
+    var navToggle = document.querySelector('.nav-toggle');
+    if (!headerInner || document.querySelector('.theme-toggle')) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'theme-toggle';
+    btn.setAttribute('aria-label', 'Toggle dark mode');
+    btn.innerHTML =
+      '<svg class="theme-toggle__sun" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8l1.8-1.8M18 6l1.8-1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>' +
+      '<svg class="theme-toggle__moon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>';
+
+    btn.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    });
+
+    if (navToggle) headerInner.insertBefore(btn, navToggle);
+    else headerInner.appendChild(btn);
+  }
 
   function loadAnalytics() {
     if (document.querySelector('script[data-cf-beacon]')) return;
@@ -37,6 +79,7 @@
 
   function initNav() {
     initCookieBanner();
+    initThemeToggle();
     var dropdowns = document.querySelectorAll('.nav-dropdown');
     dropdowns.forEach(function (dropdown) {
       var trigger = dropdown.querySelector('.nav-dropdown__trigger');
