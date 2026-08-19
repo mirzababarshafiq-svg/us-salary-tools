@@ -44,42 +44,48 @@
     if (result.error) {
       ledger.hidden = false;
       setText('out-pc-net', 'Check inputs');
-      var note = el('pc-state-note');
-      if (note) note.textContent = (result.errors || []).map(function (e) { return e.message; }).join(' · ');
+      var errNote = el('pc-state-note');
+      if (errNote) errNote.textContent = (result.errors || []).map(function (e) { return e.message; }).join(' · ');
       return;
     }
 
-    var t = result.totals;
-    var period = el('pc-frequency') ? el('pc-frequency').value : 'biweekly';
-    var grossPeriod = {
-      weekly: t.grossAnnual / 52,
-      biweekly: t.grossAnnual / 26,
-      semimonthly: t.grossAnnual / 24,
-      monthly: t.grossAnnual / 12
-    }[period] || t.grossAnnual / 26;
-    var netPeriod = {
-      weekly: t.netWeekly,
-      biweekly: t.netBiweekly,
-      semimonthly: t.netSemimonthly,
-      monthly: t.netMonthly
-    }[period] || t.netBiweekly;
+    try {
+      var t = result.totals;
+      var period = el('pc-frequency') ? el('pc-frequency').value : 'biweekly';
+      var grossPeriod = {
+        weekly: t.grossAnnual / 52,
+        biweekly: t.grossAnnual / 26,
+        semimonthly: t.grossAnnual / 24,
+        monthly: t.grossAnnual / 12
+      }[period] || t.grossAnnual / 26;
+      var netPeriod = {
+        weekly: t.netWeekly,
+        biweekly: t.netBiweekly,
+        semimonthly: t.netSemimonthly,
+        monthly: t.netMonthly
+      }[period] || t.netBiweekly;
 
-    setText('out-pc-gross', money(grossPeriod));
-    setText('out-pc-federal', money(result.federal.federalIncomeTax / (t.periodsPerYear || 26)));
-    setText('out-pc-state', money((result.state.stateIncomeTax + result.state.payroll.totalStatePayrollTax) / (t.periodsPerYear || 26)));
-    setText('out-pc-fica', money(result.fica.totalForNetPay / (t.periodsPerYear || 26)));
-    setText('out-pc-net', money(netPeriod));
-    setText('out-pc-annual-gross', money(result.grossAnnual));
-    setText('out-pc-deductions', money(t.totalDeductions));
-    setText('out-pc-annual-net', money(t.netAnnual));
-    setText('out-pc-effective-rate', percent(t.effectiveTaxRate));
+      setText('out-pc-gross', money(grossPeriod));
+      setText('out-pc-federal', money(result.federal.federalIncomeTax / (t.periodsPerYear || 26)));
+      setText('out-pc-state', money((result.state.stateIncomeTax + result.state.payroll.totalStatePayrollTax) / (t.periodsPerYear || 26)));
+      setText('out-pc-fica', money(result.fica.totalForNetPay / (t.periodsPerYear || 26)));
+      setText('out-pc-net', money(netPeriod));
+      setText('out-pc-annual-gross', money(result.grossAnnual));
+      setText('out-pc-deductions', money(t.totalDeductions));
+      setText('out-pc-annual-net', money(t.netAnnual));
+      setText('out-pc-effective-rate', percent(t.effectiveTaxRate));
 
-    var note = el('pc-state-note');
-    if (note) {
-      note.textContent = '2026 estimate · ' + (result.stateName || result.stateAbbr) + ' · Engine v' + result.ENGINE_VERSION + '. Local/city taxes may not be included.';
+      var note = el('pc-state-note');
+      if (note) {
+        note.textContent = '2026 estimate · ' + (result.stateName || result.stateAbbr) + ' · Engine v' + result.ENGINE_VERSION + '. Local/city taxes may not be included.';
+      }
+      ledger.hidden = false;
+      window.__lastPaycheckResult = result;
+    } catch (renderErr) {
+      if (window.console && console.error) console.error('render() failed:', renderErr);
+      var failNote = el('pc-state-note');
+      if (failNote) failNote.textContent = 'Display error: ' + (renderErr && renderErr.message ? renderErr.message : 'unknown');
     }
-    ledger.hidden = false;
-    window.__lastPaycheckResult = result;
   }
 
   var requestToken = 0;
@@ -120,10 +126,13 @@
       render(result);
     } catch (err) {
       if (myToken !== requestToken) return;
+      if (window.console && console.error) console.error('calculate() failed:', err);
       var fallback = el('pc-ledger');
       if (fallback) fallback.hidden = false;
       var out = el('out-pc-net');
-      if (out) out.textContent = 'Unable to calculate';
+      if (out && !/^\$[\d,]/.test(out.textContent || '')) {
+        out.textContent = 'Unable to calculate';
+      }
       var note = el('pc-state-note');
       if (note) note.textContent = 'Calculator error: ' + (err && err.message ? err.message : 'unknown error');
     }
