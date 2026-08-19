@@ -65,6 +65,7 @@
     el('out-pc-fica').textContent = money(result.fica.totalForNetPay / (t.periodsPerYear || 26));
     el('out-pc-net').textContent = money(netPeriod);
     el('out-pc-annual-gross').textContent = money(result.grossAnnual);
+    el('out-pc-deductions').textContent = money(t.totalDeductions);
     el('out-pc-annual-net').textContent = money(t.netAnnual);
     el('out-pc-effective-rate').textContent = percent(t.effectiveTaxRate);
 
@@ -89,7 +90,12 @@
         payFrequency: 'annual',
         selectedPayPeriod: (el('pc-frequency') && el('pc-frequency').value) || 'biweekly',
         age: 0,
-        deductions: {},
+        deductions: {
+          traditional401kPercent: numberValue('pc-401k', 0),
+          hsa: numberValue('pc-hsa', 0),
+          hsaCoverage: (el('pc-hsa-coverage') && el('pc-hsa-coverage').value) || 'self',
+          healthPremiums: numberValue('pc-health-premiums', 0)
+        },
         w4: {}
       };
 
@@ -118,7 +124,7 @@
     var form = el('pc-form');
     if (!form) return;
 
-    ['pc-salary', 'pc-frequency', 'pc-state', 'pc-filing-status'].forEach(function (id) {
+    ['pc-salary', 'pc-frequency', 'pc-state', 'pc-filing-status', 'pc-401k', 'pc-hsa', 'pc-hsa-coverage', 'pc-health-premiums'].forEach(function (id) {
       var node = el(id);
       if (!node) return;
       node.addEventListener('input', calculate);
@@ -136,6 +142,10 @@
       if (el('pc-frequency')) el('pc-frequency').value = 'biweekly';
       if (el('pc-filing-status')) el('pc-filing-status').value = 'single';
       if (el('pc-state')) el('pc-state').value = 'TX';
+      if (el('pc-401k')) el('pc-401k').value = '';
+      if (el('pc-hsa')) el('pc-hsa').value = '';
+      if (el('pc-hsa-coverage')) el('pc-hsa-coverage').value = 'self';
+      if (el('pc-health-premiums')) el('pc-health-premiums').value = '';
       var ledger = el('pc-ledger');
       if (ledger) ledger.hidden = true;
     });
@@ -148,6 +158,7 @@
       var text = [
         'US Salary Tools — 2026 Paycheck Estimate',
         'Annual Gross: ' + money(r.grossAnnual),
+        'Pre-tax Deductions: ' + money(t.totalDeductions),
         'Annual Net: ' + money(t.netAnnual),
         'Monthly Net: ' + money(t.netMonthly),
         'Biweekly Net: ' + money(t.netBiweekly),

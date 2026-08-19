@@ -132,7 +132,7 @@
 
       <div class="card card--calculator" id="paycheck-calculator">
         <div class="callout mb-5">
-          <strong>This is an ESTIMATE, not a paycheck guarantee.</strong> It uses simplified 2026 federal tax brackets, standard FICA rates, and an approximate state tax rate. It does not account for dependents, credits, pre-tax deductions (401(k), health insurance), or local taxes. See the assumptions below.
+          <strong>This is an ESTIMATE, not a paycheck guarantee.</strong> It uses simplified 2026 federal tax brackets, standard FICA rates, and an approximate state tax rate. Optional 401(k), HSA, and health premium deductions are supported below. It does not account for dependents, tax credits, FSA, or local taxes. See the assumptions below.
         </div>
 
         <form id="pc-form" novalidate>
@@ -172,6 +172,42 @@
             </div>
           </div>
 
+          <details class="advanced-options">
+            <summary>Advanced options — 401(k), HSA &amp; health insurance</summary>
+            <div class="form-grid form-grid--2col mt-4">
+              <div class="input-group">
+                <label for="pc-401k">Traditional 401(k) — % of salary</label>
+                <input type="text" inputmode="decimal" id="pc-401k" placeholder="0">
+                <p class="helper-text">Pre-tax retirement contribution.</p>
+              </div>
+
+              <div class="input-group">
+                <label for="pc-health-premiums">Health Insurance Premiums (annual)</label>
+                <div class="input-wrap">
+                  <span class="input-wrap__prefix">$</span>
+                  <input type="text" inputmode="decimal" id="pc-health-premiums" class="has-prefix" placeholder="0">
+                </div>
+                <p class="helper-text">Pre-tax premium deducted from pay.</p>
+              </div>
+
+              <div class="input-group">
+                <label for="pc-hsa">HSA Contribution (annual)</label>
+                <div class="input-wrap">
+                  <span class="input-wrap__prefix">$</span>
+                  <input type="text" inputmode="decimal" id="pc-hsa" class="has-prefix" placeholder="0">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label for="pc-hsa-coverage">HSA Coverage</label>
+                <select id="pc-hsa-coverage">
+                  <option value="self" selected>Self-only</option>
+                  <option value="family">Family</option>
+                </select>
+              </div>
+            </div>
+          </details>
+
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" id="pc-calculate-btn">Calculate</button>
             <button type="button" class="btn btn-secondary" id="pc-reset-btn">Reset</button>
@@ -191,6 +227,7 @@
             <div class="ledger__row"><span class="ledger__label">FICA (SS + Medicare)</span><span class="ledger__value" id="out-pc-fica">—</span></div>
             <div class="ledger__row ledger__row--primary"><span class="ledger__label">Net Pay (est.)</span><span class="ledger__value" id="out-pc-net">—</span></div>
             <div class="ledger__row"><span class="ledger__label">Annual Gross</span><span class="ledger__value" id="out-pc-annual-gross">—</span></div>
+            <div class="ledger__row"><span class="ledger__label">Pre-tax Deductions (annual)</span><span class="ledger__value" id="out-pc-deductions">—</span></div>
             <div class="ledger__row"><span class="ledger__label">Annual Net (est.)</span><span class="ledger__value" id="out-pc-annual-net">—</span></div>
             <div class="ledger__row"><span class="ledger__label">Effective Tax Rate</span><span class="ledger__value" id="out-pc-effective-rate">—</span></div>
           </div>
