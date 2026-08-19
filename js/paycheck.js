@@ -12,6 +12,11 @@
 
   function el(id) { return document.getElementById(id); }
 
+  function setText(id, value) {
+    var node = el(id);
+    if (node) node.textContent = value;
+  }
+
   function numberValue(id, fallback) {
     var node = el(id);
     if (!node) return fallback || 0;
@@ -38,7 +43,7 @@
     if (!ledger) return;
     if (result.error) {
       ledger.hidden = false;
-      el('out-pc-net').textContent = 'Check inputs';
+      setText('out-pc-net', 'Check inputs');
       var note = el('pc-state-note');
       if (note) note.textContent = (result.errors || []).map(function (e) { return e.message; }).join(' · ');
       return;
@@ -59,15 +64,15 @@
       monthly: t.netMonthly
     }[period] || t.netBiweekly;
 
-    el('out-pc-gross').textContent = money(grossPeriod);
-    el('out-pc-federal').textContent = money(result.federal.federalIncomeTax / (t.periodsPerYear || 26));
-    el('out-pc-state').textContent = money((result.state.stateIncomeTax + result.state.payroll.totalStatePayrollTax) / (t.periodsPerYear || 26));
-    el('out-pc-fica').textContent = money(result.fica.totalForNetPay / (t.periodsPerYear || 26));
-    el('out-pc-net').textContent = money(netPeriod);
-    el('out-pc-annual-gross').textContent = money(result.grossAnnual);
-    el('out-pc-deductions').textContent = money(t.totalDeductions);
-    el('out-pc-annual-net').textContent = money(t.netAnnual);
-    el('out-pc-effective-rate').textContent = percent(t.effectiveTaxRate);
+    setText('out-pc-gross', money(grossPeriod));
+    setText('out-pc-federal', money(result.federal.federalIncomeTax / (t.periodsPerYear || 26)));
+    setText('out-pc-state', money((result.state.stateIncomeTax + result.state.payroll.totalStatePayrollTax) / (t.periodsPerYear || 26)));
+    setText('out-pc-fica', money(result.fica.totalForNetPay / (t.periodsPerYear || 26)));
+    setText('out-pc-net', money(netPeriod));
+    setText('out-pc-annual-gross', money(result.grossAnnual));
+    setText('out-pc-deductions', money(t.totalDeductions));
+    setText('out-pc-annual-net', money(t.netAnnual));
+    setText('out-pc-effective-rate', percent(t.effectiveTaxRate));
 
     var note = el('pc-state-note');
     if (note) {
@@ -77,10 +82,14 @@
     window.__lastPaycheckResult = result;
   }
 
+  var requestToken = 0;
+
   async function calculate() {
+    var myToken = ++requestToken;
     try {
       var engine = await import('./tax-engine/index.js');
       var statesModule = await import('../data/states-2026.js');
+      if (myToken !== requestToken) return; // a newer call started; drop this stale one
       ensureStates(statesModule.STATES_2026);
 
       var raw = {
@@ -107,8 +116,10 @@
 
       var sanitized = engine.sanitizeInputs(raw);
       var result = engine.calculateAll(sanitized);
+      if (myToken !== requestToken) return; // a newer call finished first
       render(result);
     } catch (err) {
+      if (myToken !== requestToken) return;
       var fallback = el('pc-ledger');
       if (fallback) fallback.hidden = false;
       var out = el('out-pc-net');
