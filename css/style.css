@@ -696,7 +696,7 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon { display: none; }
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
-.breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .breadcrumb a { color: var(--color-text-muted); text-decoration: none; }
 .breadcrumb a:hover { color: var(--color-heading); text-decoration: underline; }
 .breadcrumb li:not(:last-child)::after {
