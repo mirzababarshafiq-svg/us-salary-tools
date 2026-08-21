@@ -24,18 +24,55 @@
     return Number.isFinite(n) ? n : (fallback || 0);
   }
 
-  function ensureStates(STATES_2026) {
+  function ensureStates(STATES_2026, preferredState) {
     var select = el('pc-state');
-    if (!select || select.options.length) return;
-    Object.keys(STATES_2026).sort(function (a, b) {
-      return String(STATES_2026[a].name || a).localeCompare(String(STATES_2026[b].name || b));
-    }).forEach(function (abbr) {
-      var option = document.createElement('option');
-      option.value = abbr;
-      option.textContent = STATES_2026[abbr].name || abbr;
-      select.appendChild(option);
-    });
-    select.value = 'TX';
+    if (!select) return;
+    if (!select.options.length) {
+      Object.keys(STATES_2026).sort(function (a, b) {
+        return String(STATES_2026[a].name || a).localeCompare(String(STATES_2026[b].name || b));
+      }).forEach(function (abbr) {
+        var option = document.createElement('option');
+        option.value = abbr;
+        option.textContent = STATES_2026[abbr].name || abbr;
+        select.appendChild(option);
+      });
+      select.value = preferredState || 'TX';
+    }
+  }
+
+  var SAVE_KEY = 'pc-saved-inputs';
+
+  function loadSavedInputs() {
+    try {
+      var raw = localStorage.getItem(SAVE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function saveInputs() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        salary: el('pc-salary') ? el('pc-salary').value : '',
+        frequency: el('pc-frequency') ? el('pc-frequency').value : '',
+        state: el('pc-state') ? el('pc-state').value : '',
+        filingStatus: el('pc-filing-status') ? el('pc-filing-status').value : '',
+        k401: el('pc-401k') ? el('pc-401k').value : '',
+        hsa: el('pc-hsa') ? el('pc-hsa').value : '',
+        hsaCoverage: el('pc-hsa-coverage') ? el('pc-hsa-coverage').value : '',
+        healthPremiums: el('pc-health-premiums') ? el('pc-health-premiums').value : ''
+      }));
+    } catch (e) {}
+  }
+
+  function restoreSavedInputs(saved) {
+    if (!saved) return;
+    if (el('pc-salary') && saved.salary) el('pc-salary').value = saved.salary;
+    if (el('pc-frequency') && saved.frequency) el('pc-frequency').value = saved.frequency;
+    if (el('pc-filing-status') && saved.filingStatus) el('pc-filing-status').value = saved.filingStatus;
+    if (el('pc-401k') && saved.k401) el('pc-401k').value = saved.k401;
+    if (el('pc-hsa') && saved.hsa) el('pc-hsa').value = saved.hsa;
+    if (el('pc-hsa-coverage') && saved.hsaCoverage) el('pc-hsa-coverage').value = saved.hsaCoverage;
+    if (el('pc-health-premiums') && saved.healthPremiums) el('pc-health-premiums').value = saved.healthPremiums;
   }
 
   function render(result) {
@@ -96,7 +133,8 @@
       var engine = await import('./tax-engine/index.js');
       var statesModule = await import('../data/states-2026.js');
       if (myToken !== requestToken) return; // a newer call started; drop this stale one
-      ensureStates(statesModule.STATES_2026);
+      var savedForState = loadSavedInputs();
+      ensureStates(statesModule.STATES_2026, savedForState && savedForState.state);
 
       var raw = {
         grossAnnual: numberValue('pc-salary', 0),
@@ -124,6 +162,7 @@
       var result = engine.calculateAll(sanitized);
       if (myToken !== requestToken) return; // a newer call finished first
       render(result);
+      saveInputs();
     } catch (err) {
       if (myToken !== requestToken) return;
       if (window.console && console.error) console.error('calculate() failed:', err);
@@ -143,6 +182,8 @@
     initialized = true;
     var form = el('pc-form');
     if (!form) return;
+
+    restoreSavedInputs(loadSavedInputs());
 
     ['pc-salary', 'pc-frequency', 'pc-state', 'pc-filing-status', 'pc-401k', 'pc-hsa', 'pc-hsa-coverage', 'pc-health-premiums'].forEach(function (id) {
       var node = el(id);
@@ -166,6 +207,7 @@
       if (el('pc-hsa')) el('pc-hsa').value = '';
       if (el('pc-hsa-coverage')) el('pc-hsa-coverage').value = 'self';
       if (el('pc-health-premiums')) el('pc-health-premiums').value = '';
+      try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
       var ledger = el('pc-ledger');
       if (ledger) ledger.hidden = true;
     });
@@ -185,6 +227,11 @@
         'Effective Tax Rate: ' + percent(t.effectiveTaxRate)
       ].join('\n');
       window.copyToClipboard(text);
+    });
+
+    var printBtn = el('pc-print-btn');
+    if (printBtn) printBtn.addEventListener('click', function () {
+      window.print();
     });
 
     calculate();

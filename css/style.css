@@ -970,3 +970,17 @@ html[data-theme="dark"] .theme-toggle .theme-toggle__moon { display: none; }
   color: var(--color-blue);
   font-weight: 800;
 }
+
+/* ---------- 21. Print (calculator results) ---------- */
+@media print {
+  html[data-theme] { --color-bg: #fff; --color-surface: #fff; --color-text: #111; --color-heading: #111; --color-text-muted: #444; --color-border: #ccc; }
+  body { background: #fff !important; color: #111 !important; }
+  .site-header, .nav-mobile, .breadcrumb, .site-footer, .cookie-banner,
+  .theme-toggle, .nav-toggle, .skip-link,
+  .form-actions, #pc-copy-btn, #pc-print-btn, .btn { display: none !important; }
+  main { padding: 0 !important; }
+  .card, .ledger { box-shadow: none !important; border: 1px solid #ccc !important; }
+  .ledger__row--primary { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a { color: #111 !important; text-decoration: none !important; }
+  section { padding: var(--sp-3) 0 !important; }
+}
