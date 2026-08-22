@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salary to Hourly Calculator | US Salary Tools</title>
-<meta name="description" content="Convert your annual salary into an hourly rate, plus weekly, biweekly, monthly, and daily pay. Free and instant.">
-<link rel="canonical" href="https://ussalarytools.com/salary-to-hourly">
+<title>State Tax Comparison Calculator | US Salary Tools</title>
+<meta name="description" content="Compare take-home pay between two U.S. states for the same salary. See federal, state, and FICA taxes side by side, updated for 2026.">
+<link rel="canonical" href="https://ussalarytools.com/state-comparison">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="US Salary Tools">
-<meta property="og:title" content="Salary to Hourly Calculator — Find Your Effective Hourly Rate">
-<meta property="og:description" content="Convert your annual salary into an hourly rate, plus weekly, biweekly, monthly, and daily pay. Free and instant.">
-<meta property="og:url" content="https://ussalarytools.com/salary-to-hourly">
+<meta property="og:title" content="State Tax Comparison Calculator">
+<meta property="og:description" content="Compare take-home pay between two U.S. states for the same salary. See federal, state, and FICA taxes side by side, updated for 2026.">
+<meta property="og:url" content="https://ussalarytools.com/state-comparison">
 <meta property="og:image" content="https://ussalarytools.com/assets/og-image.png">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Salary to Hourly Calculator — Find Your Effective Hourly Rate">
-<meta name="twitter:description" content="Convert your annual salary into an hourly rate, plus weekly, biweekly, monthly, and daily pay. Free and instant.">
+<meta name="twitter:title" content="State Tax Comparison Calculator">
+<meta name="twitter:description" content="Compare take-home pay between two U.S. states for the same salary. See federal, state, and FICA taxes side by side, updated for 2026.">
 <meta name="twitter:image" content="https://ussalarytools.com/assets/og-image.png">
 
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -30,19 +30,8 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://ussalarytools.com/" },
-    { "@type": "ListItem", "position": 2, "name": "Salary to Hourly", "item": "https://ussalarytools.com/salary-to-hourly" }
+    { "@type": "ListItem", "position": 2, "name": "State Tax Comparison", "item": "https://ussalarytools.com/state-comparison" }
   ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Salary to Hourly Calculator",
-  "applicationCategory": "FinanceApplication",
-  "operatingSystem": "Any (web browser)",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "url": "https://ussalarytools.com/salary-to-hourly"
 }
 </script>
 <script type="application/ld+json">
@@ -50,10 +39,9 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    { "@type": "Question", "name": "How do I convert my salary to an hourly rate?", "acceptedAnswer": { "@type": "Answer", "text": "Divide your annual salary by your total hours worked per year (hours per week × weeks per year). That's your effective hourly rate." } },
-    { "@type": "Question", "name": "Why does my hourly rate change if I edit weeks per year?", "acceptedAnswer": { "@type": "Answer", "text": "Because your salary is being spread across fewer or more actual working weeks — useful if you take unpaid leave or work a seasonal schedule." } },
-    { "@type": "Question", "name": "Is this useful for comparing job offers?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Converting salaried offers to an hourly rate makes it easier to compare against hourly or contract positions on a like-for-like basis." } },
-    { "@type": "Question", "name": "Does this account for benefits like health insurance or PTO?", "acceptedAnswer": { "@type": "Answer", "text": "No — this is a pay-only calculation. Benefits add real value but aren't included in this hourly-rate estimate." } }
+    { "@type": "Question", "name": "Why does the same salary give different take-home pay in different states?", "acceptedAnswer": { "@type": "Answer", "text": "Federal income tax and FICA (Social Security and Medicare) are the same everywhere in the U.S. The difference comes entirely from state income tax, which ranges from 0% in states like Texas and Florida to over 10% in states like California for higher incomes." } },
+    { "@type": "Question", "name": "Which states have no state income tax?", "acceptedAnswer": { "@type": "Answer", "text": "As of 2026, Alaska, Florida, Nevada, South Dakota, Tennessee, Texas, Washington, and Wyoming have no broad state income tax on wages. New Hampshire also does not tax wage income." } },
+    { "@type": "Question", "name": "Is this comparison exact?", "acceptedAnswer": { "@type": "Answer", "text": "No, it is an estimate. State income tax figures use a simplified approximation of each state's rules and do not account for local or city taxes, credits, or itemized deductions. Use it to compare relative differences between states, not as an exact number for either state." } }
   ]
 }
 </script>
@@ -70,7 +58,6 @@
       </svg>
       US Salary Tools
     </a>
-
     <nav class="nav-desktop" aria-label="Primary">
       <a href="/">Home</a>
       <div class="nav-dropdown" data-open="false">
@@ -85,7 +72,7 @@
           <a href="/overtime-calculator">Overtime Calculator</a>
           <a href="/paycheck-calculator">Paycheck Calculator</a>
           <a href="/raise-calculator">Raise Calculator</a>
-          <a href="/state-comparison">State Comparison</a>
+          <a href="/state-comparison" aria-current="page">State Comparison</a>
         </div>
       </div>
       <a href="/blog/">Blog</a>
@@ -93,24 +80,22 @@
       <a href="/methodology">Methodology</a>
       <a href="/contact">Contact</a>
     </nav>
-
     <button class="nav-toggle" aria-expanded="false" aria-label="Open menu">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
     </button>
   </div>
-
   <nav class="nav-mobile" data-open="false" aria-label="Mobile">
     <ul class="nav-mobile__list">
       <li><a href="/">Home</a></li>
       <li><a href="/salary-calculator">Salary Calculator</a></li>
       <li><a href="/hourly-to-salary">Hourly to Salary</a></li>
-      <li><a href="/salary-to-hourly" aria-current="page">Salary to Hourly</a></li>
+      <li><a href="/salary-to-hourly">Salary to Hourly</a></li>
       <li><a href="/overtime-calculator">Overtime Calculator</a></li>
       <li><a href="/paycheck-calculator">Paycheck Calculator</a></li>
-      <li><a href="/raise-calculator">Raise Calculator</a>
-          <a href="/state-comparison">State Comparison</a></li>
-      <li><a href="/blog/">Blog</a>
-      <a href="/about">About</a></li>
+      <li><a href="/raise-calculator">Raise Calculator</a></li>
+      <li><a href="/state-comparison" aria-current="page">State Comparison</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about">About</a></li>
       <li><a href="/methodology">Methodology</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
@@ -121,7 +106,7 @@
   <div class="container">
     <ol>
       <li><a href="/">Home</a></li>
-      <li aria-current="page">Salary to Hourly</li>
+      <li aria-current="page">State Tax Comparison</li>
     </ol>
   </div>
 </div>
@@ -129,117 +114,121 @@
 <main id="main">
   <section>
     <div class="container">
-      <span class="eyebrow">Free Tool</span>
-      <h1>Salary to Hourly Calculator</h1>
-      <p class="text-muted max-w-prose mb-5">Find out exactly what your annual salary works out to per hour — handy for comparing job offers or freelance rates.</p>
+      <span class="eyebrow">Free Tool · Tax Year 2026</span>
+      <h1>State Tax Comparison Calculator</h1>
+      <p class="text-muted max-w-prose mb-5">Same salary, two states — see exactly how much of the difference in take-home pay comes down to where you live.</p>
 
-      <div class="card card--calculator" id="stoh-calculator">
-        <form id="stoh-form" novalidate>
+      <div class="card card--calculator" id="state-comparison-calculator">
+        <div class="callout mb-5">
+          <strong>This is an ESTIMATE, not a paycheck guarantee.</strong> It uses 2026 federal tax brackets, standard FICA rates, and an approximate state tax rate for each state. It does not account for local taxes, credits, or pre-tax deductions.
+        </div>
+
+        <form id="sc-form" novalidate>
           <div class="form-grid form-grid--2col">
             <div class="input-group">
-              <label for="stoh-salary">Annual Salary</label>
+              <label for="sc-salary">Annual Salary (Gross)</label>
               <div class="input-wrap">
                 <span class="input-wrap__prefix">$</span>
-                <input type="text" inputmode="decimal" id="stoh-salary" class="has-prefix" placeholder="65,000" aria-describedby="err-stoh-salary">
+                <input type="text" inputmode="decimal" id="sc-salary" class="has-prefix" placeholder="80,000" aria-describedby="err-sc-salary">
               </div>
-              <p class="helper-text">Your gross yearly pay before taxes.</p>
-              <p class="field-error" id="err-stoh-salary" role="alert"></p>
+              <p class="field-error" id="err-sc-salary" role="alert"></p>
             </div>
 
             <div class="input-group">
-              <label for="stoh-hours">Hours per Week</label>
-              <input type="text" inputmode="decimal" id="stoh-hours" value="40" aria-describedby="err-stoh-hours">
-              <p class="helper-text">Typical hours you work weekly.</p>
-              <p class="field-error" id="err-stoh-hours" role="alert"></p>
+              <label for="sc-filing-status">Filing Status</label>
+              <select id="sc-filing-status">
+                <option value="single" selected>Single</option>
+                <option value="marriedJointly">Married Filing Jointly</option>
+                <option value="headOfHousehold">Head of Household</option>
+              </select>
             </div>
 
             <div class="input-group">
-              <label for="stoh-weeks">Weeks per Year</label>
-              <input type="text" inputmode="decimal" id="stoh-weeks" value="52" aria-describedby="err-stoh-weeks">
-              <p class="helper-text">Weeks actually worked (52 if year-round).</p>
-              <p class="field-error" id="err-stoh-weeks" role="alert"></p>
+              <label for="sc-state-a">State A</label>
+              <select id="sc-state-a"></select>
+            </div>
+
+            <div class="input-group">
+              <label for="sc-state-b">State B</label>
+              <select id="sc-state-b"></select>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="stoh-calculate-btn">Calculate</button>
-            <button type="button" class="btn btn-secondary" id="stoh-reset-btn">Reset</button>
+            <button type="submit" class="btn btn-primary" id="sc-calculate-btn">Compare</button>
+            <button type="button" class="btn btn-secondary" id="sc-reset-btn">Reset</button>
           </div>
         </form>
 
-        <div class="ledger" id="stoh-ledger" hidden>
-          <div class="ledger__tear"></div>
+        <div class="ledger" id="sc-ledger" hidden>
           <div class="ledger__head">
-            <span class="ledger__head-title">Your Estimate</span>
-            <span class="badge badge-free">Free</span>
+            <span class="ledger__head-title">Side-by-Side Comparison</span>
+            <span class="badge badge-estimate">Estimate</span>
           </div>
           <div class="ledger__body">
-            <div class="ledger__row ledger__row--primary"><span class="ledger__label">Hourly Rate</span><span class="ledger__value" id="out-s-hourly">—</span></div>
-            <div class="ledger__row"><span class="ledger__label">Weekly</span><span class="ledger__value" id="out-s-weekly">—</span></div>
-            <div class="ledger__row"><span class="ledger__label">Biweekly</span><span class="ledger__value" id="out-s-biweekly">—</span></div>
-            <div class="ledger__row"><span class="ledger__label">Monthly</span><span class="ledger__value" id="out-s-monthly">—</span></div>
-            <div class="ledger__row"><span class="ledger__label">Daily</span><span class="ledger__value" id="out-s-daily">—</span></div>
+            <div class="ledger__row--primary" id="sc-summary" style="margin:0 0 var(--sp-5);"></div>
+
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th style="text-align:right;" id="sc-head-a">State A</th>
+                    <th style="text-align:right;" id="sc-head-b">State B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Gross Annual</td><td style="text-align:right;" id="sc-a-gross">—</td><td style="text-align:right;" id="sc-b-gross">—</td></tr>
+                  <tr><td>Federal Income Tax</td><td style="text-align:right;" id="sc-a-federal">—</td><td style="text-align:right;" id="sc-b-federal">—</td></tr>
+                  <tr><td>State Income Tax</td><td style="text-align:right;" id="sc-a-state">—</td><td style="text-align:right;" id="sc-b-state">—</td></tr>
+                  <tr><td>FICA (SS + Medicare)</td><td style="text-align:right;" id="sc-a-fica">—</td><td style="text-align:right;" id="sc-b-fica">—</td></tr>
+                  <tr><td><strong>Net Annual</strong></td><td style="text-align:right;"><strong id="sc-a-net">—</strong></td><td style="text-align:right;"><strong id="sc-b-net">—</strong></td></tr>
+                  <tr><td>Net Monthly</td><td style="text-align:right;" id="sc-a-net-monthly">—</td><td style="text-align:right;" id="sc-b-net-monthly">—</td></tr>
+                  <tr><td>Effective Tax Rate</td><td style="text-align:right;" id="sc-a-rate">—</td><td style="text-align:right;" id="sc-b-rate">—</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="ledger__footer">
-            <button type="button" class="btn btn-ghost" id="stoh-copy-btn">Copy Results</button>
-            <span class="text-muted" style="font-size:0.8rem;">Hourly rate uses your entered hours &amp; weeks; Weekly/Biweekly/Monthly assume standard 52-week distribution.</span>
+            <button type="button" class="btn btn-ghost" id="sc-copy-btn">Copy Results</button>
+            <button type="button" class="btn btn-ghost" id="sc-print-btn">Print / Save as PDF</button>
           </div>
         </div>
       </div>
 
-      <p class="text-muted mt-4" style="font-size:0.85rem;">Going the other way? Try <a class="link" href="/hourly-to-salary">Hourly to Salary</a>, or see the full picture with the <a class="link" href="/salary-calculator">Salary Calculator</a>.</p>
+      <p class="text-muted mt-4" style="font-size:0.85rem;">Want the full breakdown for just one state? Try the <a class="link" href="/paycheck-calculator">Paycheck Calculator</a>.</p>
     </div>
   </section>
 
-  <section>
-    <div class="container">
-      <div class="ad-placeholder">Advertisement</div>
-    </div>
-  </section>
-
-  <section class="section-alt" aria-labelledby="stoh-faq-heading">
+  <section class="section-alt" aria-labelledby="sc-faq-heading">
     <div class="container">
       <span class="eyebrow">Questions</span>
-      <h2 id="stoh-faq-heading">Frequently asked questions</h2>
+      <h2 id="sc-faq-heading">Frequently asked questions</h2>
       <div class="mt-5" style="max-width:760px;">
         <div class="faq-item" data-open="false">
           <button class="faq-item__q" aria-expanded="false">
-            <span>How do I convert my salary to an hourly rate?</span>
+            <span>Why does the same salary give different take-home pay in different states?</span>
             <svg class="faq-item__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
-          <div class="faq-item__a"><div class="faq-item__a-inner">Divide your annual salary by your total hours worked per year (hours per week × weeks per year). That's your effective hourly rate.</div></div>
+          <div class="faq-item__a"><div class="faq-item__a-inner">Federal income tax and FICA (Social Security and Medicare) are the same everywhere in the U.S. The difference comes entirely from state income tax, which ranges from 0% in states like Texas and Florida to over 10% in states like California for higher incomes.</div></div>
         </div>
         <div class="faq-item" data-open="false">
           <button class="faq-item__q" aria-expanded="false">
-            <span>Why does my hourly rate change if I edit weeks per year?</span>
+            <span>Which states have no state income tax?</span>
             <svg class="faq-item__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
-          <div class="faq-item__a"><div class="faq-item__a-inner">Because your salary is being spread across fewer or more actual working weeks — useful if you take unpaid leave or work a seasonal schedule.</div></div>
+          <div class="faq-item__a"><div class="faq-item__a-inner">As of 2026, Alaska, Florida, Nevada, South Dakota, Tennessee, Texas, Washington, and Wyoming have no broad state income tax on wages. New Hampshire also does not tax wage income.</div></div>
         </div>
         <div class="faq-item" data-open="false">
           <button class="faq-item__q" aria-expanded="false">
-            <span>Is this useful for comparing job offers?</span>
+            <span>Is this comparison exact?</span>
             <svg class="faq-item__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
-          <div class="faq-item__a"><div class="faq-item__a-inner">Yes. Converting salaried offers to an hourly rate makes it easier to compare against hourly or contract positions on a like-for-like basis.</div></div>
-        </div>
-        <div class="faq-item" data-open="false">
-          <button class="faq-item__q" aria-expanded="false">
-            <span>Does this account for benefits like health insurance or PTO?</span>
-            <svg class="faq-item__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          </button>
-          <div class="faq-item__a"><div class="faq-item__a-inner">No — this is a pay-only calculation. Benefits add real value but aren't included in this hourly-rate estimate.</div></div>
+          <div class="faq-item__a"><div class="faq-item__a-inner">No, it is an estimate. State income tax figures use a simplified approximation of each state's rules and do not account for local or city taxes, credits, or itemized deductions. Use it to compare relative differences between states, not as an exact number for either state.</div></div>
         </div>
       </div>
     </div>
   </section>
-
-  <section>
-    <div class="container">
-      <div class="callout"><strong>Disclaimer:</strong> This calculator provides gross-pay estimates for informational purposes only. Read our full <a class="link" href="/disclaimer">Disclaimer</a>.</div>
-    </div>
-  </section>
-
 </main>
 
 <footer class="site-footer">
@@ -257,15 +246,15 @@
           <li><a href="/salary-to-hourly">Salary to Hourly</a></li>
           <li><a href="/overtime-calculator">Overtime Calculator</a></li>
           <li><a href="/paycheck-calculator">Paycheck Calculator</a></li>
-          <li><a href="/raise-calculator">Raise Calculator</a>
-          <a href="/state-comparison">State Comparison</a></li>
+          <li><a href="/raise-calculator">Raise Calculator</a></li>
+          <li><a href="/state-comparison">State Comparison</a></li>
         </ul>
       </div>
       <div>
         <h4>Company</h4>
         <ul>
-          <li><a href="/blog/">Blog</a>
-      <a href="/about">About</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/about">About</a></li>
           <li><a href="/methodology">Methodology</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
@@ -279,9 +268,7 @@
         </ul>
       </div>
     </div>
-
     <p class="footer-disclaimer">US Salary Tools is an independent resource and is not affiliated with the IRS, Social Security Administration, or any U.S. government agency. All calculators provide estimates for informational purposes only and should not be treated as financial, tax, or legal advice.</p>
-
     <div class="footer-bottom">
       <span>© <span class="current-year"></span> US Salary Tools. All rights reserved.</span>
       <span>Made for U.S. workers, freelancers, and job seekers.</span>
@@ -302,6 +289,6 @@
 </noscript>
 <script src="/js/utils.js?v=2026.1.4"></script>
 <script src="/js/main.js?v=2026.1.4"></script>
-<script src="/js/salary-to-hourly.js?v=2026.1.4"></script>
+<script src="/js/state-comparison.js?v=2026.1.4"></script>
 </body>
 </html>
