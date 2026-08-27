@@ -1,4 +1,5 @@
 import { STATES_2026 } from "../../data/states-2026.js";
+import { LOCAL_TAX_RULES_2026 } from "../../data/local-tax-rules-2026.js";
 function getState(stateAbbr){ return STATES_2026[stateAbbr]; }
 function bracketWalk(taxableIncome,brackets){
   if (taxableIncome<=0) return 0;
@@ -47,10 +48,41 @@ export function calculateStatePayrollTaxes(grossWages,ficaWages,stateAbbr){
   const stateData=getState(stateAbbr);if (!stateData) throw new Error(`Unknown state ${stateAbbr}`);
   const payrollTaxes=stateData.employeePayrollTaxes||[];let total=0;const details=[];
   for (const pt of payrollTaxes){const base=pt.appliesTo==="grossWages"?grossWages:ficaWages;const wageBase=pt.wageBase;const taxable=wageBase?Math.min(base,wageBase):base;const tax=taxable*pt.rate;total+=tax;details.push({name:pt.name,rate:pt.rate,wageBase:wageBase,taxableWages:taxable,tax:Math.round(tax*100)/100,source:pt.source,confidence:pt.confidence});}
+  // 2026 employee payroll deductions that are currently published outside the generic state data.
+  if (stateAbbr === "NY") {
+    const pflTax = Math.min(grossWages * 0.00432, 411.91);
+    total += pflTax;
+    details.push({name:"NY Paid Family Leave",rate:0.00432,wageBase:null,taxableWages:grossWages,tax:Math.round(pflTax*100)/100,source:"NYS 2026 Paid Family Leave",confidence:"verified"});
+  }
+  if (stateAbbr === "WA") {
+    const pfmlBase = Math.min(grossWages,184500);
+    const pfmlTax = pfmlBase * 0.0113 * 0.7143;
+    total += pfmlTax;
+    details.push({name:"WA Paid Family & Medical Leave",rate:0.0113*0.7143,wageBase:184500,taxableWages:pfmlBase,tax:Math.round(pfmlTax*100)/100,source:"Washington PFML 2026 employee share",confidence:"verified"});
+    const caresTax = grossWages * 0.0058;
+    total += caresTax;
+    details.push({name:"WA Cares",rate:0.0058,wageBase:null,taxableWages:grossWages,tax:Math.round(caresTax*100)/100,source:"WA Cares 2026 employee premium",confidence:"verified"});
+  }
   return {stateAbbr,totalStatePayrollTax:Math.round(total*100)/100,details};
 }
-export function calculateLocalTax(stateAbbr){
-  const stateData=getState(stateAbbr);const local=stateData?.localTax;
+export function calculateLocalTax(stateAbbr, options={}){
+  const stateData=getState(stateAbbr);const jurisdiction=String(options.jurisdiction||"").toUpperCase();
+  const rule=LOCAL_TAX_RULES_2026[jurisdiction];
+  if (rule && rule.state===stateAbbr) {
+    const filingStatus=options.filingStatus||"single";
+    const taxableWages=Number(options.stateTaxableIncome)||0;
+    if (rule.type==="progressive") {
+      const deduction=(rule.standardDeduction||{})[filingStatus]||0;
+      const taxable=Math.max(0,taxableWages-deduction);
+      const brackets=rule.brackets[filingStatus]||rule.brackets.single||[];
+      const tax=Math.round(bracketWalk(taxable,brackets)*100)/100;
+      return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxable,details:{type:rule.type,filingStatus,standardDeduction:deduction},note:`${rule.name} personal income tax modeled.` ,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
+    }
+    const residency=String(options.residency||"resident").toLowerCase();
+    const rate=residency==="nonresident"?(rule.nonResidentRate??rule.residentRate):rule.residentRate;
+    const tax=Math.round(Math.max(0,taxableWages*rate)*100)/100;
+    return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxableWages,residency,rate,details:{type:rule.type},note:`${rule.name} local income tax modeled.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
+  }
   if (!local || local.exists===false) return {exists:false,modeled:true,localIncomeTax:0,note:"No modeled local individual income tax for this state."};
   return {exists:true,modeled:false,localIncomeTax:0,note:local.note||"Local/city/county income taxes are not included."};
 }
