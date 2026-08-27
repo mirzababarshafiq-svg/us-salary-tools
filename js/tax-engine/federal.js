@@ -16,6 +16,8 @@ export function calculateFederalSpecialDeductions(federalTaxableWages,filingStat
   const tips=phaseout(Math.min(d.qualifiedTips||0,25000),magi,joint?300000:150000);
   const senior=seniorEligible?phaseout(6000,magi,joint?150000:75000):0;
   const carLoan=phaseout(Math.min(d.qualifiedCarLoanInterest||0,10000),magi,joint?200000:100000);
+  const warnings=[];
+  if (d.qualifiedCarLoanInterest>0) warnings.push("Qualified car-loan-interest eligibility is assumed for the supplied amount; vehicle/use requirements are not independently verified.");
   return {
     magi,
     qualifiedOvertimeRequested:d.qualifiedOvertime||0,
@@ -28,9 +30,9 @@ export function calculateFederalSpecialDeductions(federalTaxableWages,filingStat
     totalAdditionalDeduction:overtime+tips+senior+carLoan,
     notes:[
       "Qualified overtime, tips, senior and qualified car-loan-interest deductions are federal income-tax deductions and do not reduce Social Security or Medicare wages.",
-      "Car-loan-interest eligibility depends on federal vehicle/use requirements; the engine treats a supplied amount as qualified.",
       "The senior deduction models one taxpayer; spouse-level senior eligibility requires a separate spouse-age input."
-    ]
+    ],
+    warnings
   };
 }
 
@@ -79,33 +81,14 @@ export function calculateFederalWithholding(federalTaxableWages,filingStatus,w4=
   const exempt=!!w4.exempt;
 
   if(exempt){
-    return {
-      method:"IRS Pub. 15-T (2026) Worksheet 1A",
-      exempt:true,
-      federalWithholdingAnnual:0,
-      federalWithholdingPerPeriod:0,
-      adjustedAnnualWageAmount:0,
-      tentativeWithholdingAnnual:0,
-      step3AnnualCredit:step3Amount,
-      step4cPerPeriod:step4cPerPeriod,
-      warnings:["Federal income-tax withholding is $0 because the W-4 exemption election is selected."]
-    };
+    return {method:"IRS Pub. 15-T (2026) Worksheet 1A",exempt:true,federalWithholdingAnnual:0,federalWithholdingPerPeriod:0,adjustedAnnualWageAmount:0,tentativeWithholdingAnnual:0,step3AnnualCredit:step3Amount,step4cPerPeriod:step4cPerPeriod,warnings:["Federal income-tax withholding is $0 because the W-4 exemption election is selected."]};
   }
 
   if(!hasValidIrspayPeriod){
     const adjustedWages=Math.max(0,federalTaxableWages+step4a-specialDeductions-step4b);
     const annualTax=calculateFederalTax(calculateFederalTaxableIncome(adjustedWages,filingStatus).federalTaxableIncome,filingStatus).federalIncomeTax;
     const annual=Math.max(0,annualTax-step3Amount)+(step4cPerPeriod*normalizedPeriods);
-    return {
-      method:"IRS-style annualized fallback (no Pub. 15-T annual payroll period)",
-      adjustedAnnualWageAmount:adjustedWages,
-      tentativeWithholdingAnnual:Math.max(0,annualTax-step3Amount),
-      federalWithholdingAnnual:Math.round(annual*100)/100,
-      federalWithholdingPerPeriod:Math.round(annual/normalizedPeriods*100)/100,
-      step3AnnualCredit:step3Amount,
-      step4cPerPeriod:step4cPerPeriod,
-      warnings:["The selected payroll period is not one of the 2026 IRS Pub. 15-T Worksheet 1A periods; annualized fallback used."]
-    };
+    return {method:"IRS-style annualized fallback (no Pub. 15-T annual payroll period)",adjustedAnnualWageAmount:adjustedWages,tentativeWithholdingAnnual:Math.max(0,annualTax-step3Amount),federalWithholdingAnnual:Math.round(annual*100)/100,federalWithholdingPerPeriod:Math.round(annual/normalizedPeriods*100)/100,step3AnnualCredit:step3Amount,step4cPerPeriod:step4cPerPeriod,warnings:["The selected payroll period is not one of the 2026 IRS Pub. 15-T Worksheet 1A periods; annualized fallback used."]};
   }
 
   const standardAdj=filingStatus==="marriedJointly"?WITHHOLDING_2026.standardAdjustment.marriedJointly:WITHHOLDING_2026.standardAdjustment.other;
@@ -118,23 +101,5 @@ export function calculateFederalWithholding(federalTaxableWages,filingStatus,w4=
   const finalPerPeriod=Math.max(0,tentativePerPeriod-creditPerPeriod)+step4cPerPeriod;
   const finalAnnual=finalPerPeriod*normalizedPeriods;
 
-  return {
-    method:"IRS Pub. 15-T (2026) Worksheet 1A — Percentage Method",
-    payrollPeriod:periodName,
-    payPeriodsPerYear:normalizedPeriods,
-    step2Checkbox:multipleJobs,
-    step4aOtherIncome:step4a,
-    step4bDeductions:step4b,
-    federalSpecialDeductionsUsed:specialDeductions,
-    standardAdjustmentApplied:standardAdj*(multipleJobs?0:1),
-    adjustedAnnualWageAmount:Math.round(adjustedAnnual*100)/100,
-    tentativeWithholdingAnnual:Math.round(annualTableTax*100)/100,
-    tentativeWithholdingPerPeriod:Math.round(tentativePerPeriod*100)/100,
-    step3AnnualCredit:step3Amount,
-    step3CreditPerPeriod:Math.round(creditPerPeriod*100)/100,
-    step4cPerPeriod:step4cPerPeriod,
-    federalWithholdingAnnual:Math.round(finalAnnual*100)/100,
-    federalWithholdingPerPeriod:Math.round(finalPerPeriod*100)/100,
-    warnings:[]
-  };
+  return {method:"IRS Pub. 15-T (2026) Worksheet 1A — Percentage Method",payrollPeriod:periodName,payPeriodsPerYear:normalizedPeriods,step2Checkbox:multipleJobs,step4aOtherIncome:step4a,step4bDeductions:step4b,federalSpecialDeductionsUsed:specialDeductions,standardAdjustmentApplied:standardAdj*(multipleJobs?0:1),adjustedAnnualWageAmount:Math.round(adjustedAnnual*100)/100,tentativeWithholdingAnnual:Math.round(annualTableTax*100)/100,tentativeWithholdingPerPeriod:Math.round(tentativePerPeriod*100)/100,step3AnnualCredit:step3Amount,step3CreditPerPeriod:Math.round(creditPerPeriod*100)/100,step4cPerPeriod:step4cPerPeriod,federalWithholdingAnnual:Math.round(finalAnnual*100)/100,federalWithholdingPerPeriod:Math.round(finalPerPeriod*100)/100,warnings:[]};
 }
