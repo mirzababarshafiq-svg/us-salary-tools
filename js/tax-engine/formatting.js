@@ -1,4 +1,4 @@
-export const ENGINE_VERSION = "2026.1.0";
+export const ENGINE_VERSION = "2026.2.0";
 export const TAX_YEAR = 2026;
 export function formatCurrency(amount, opts={}) {
   const {decimals=2}=opts;
