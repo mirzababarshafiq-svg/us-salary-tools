@@ -41,12 +41,19 @@ export function sanitizeInputs(raw={}){
     qualifiedCarLoanInterest:cleanNumber(raw.federalDeductions?.qualifiedCarLoanInterest ?? raw.qualifiedCarLoanInterest ?? 0),
     seniorDeductionEligible:raw.federalDeductions?.seniorDeductionEligible ?? raw.seniorDeductionEligible ?? null,
   };
+  const rw=raw.w4||{};
   out.w4={
-    multipleJobs:!!raw.w4?.multipleJobs,
-    dependentAmount:cleanNumber(raw.w4?.dependentAmount ?? 0),
-    otherIncome:cleanNumber(raw.w4?.otherIncome ?? 0),
-    deductions:cleanNumber(raw.w4?.deductions ?? 0),
-    extraWithholding:cleanNumber(raw.w4?.extraWithholding ?? 0),
+    multipleJobs:!!(rw.step2Checkbox ?? rw.multipleJobs),
+    step2Checkbox:!!(rw.step2Checkbox ?? rw.multipleJobs),
+    dependentAmount:cleanNumber(rw.dependentAmount ?? rw.step3Amount ?? 0),
+    step3Amount:cleanNumber(rw.step3Amount ?? rw.dependentAmount ?? 0),
+    otherIncome:cleanNumber(rw.otherIncome ?? rw.step4aOtherIncome ?? 0),
+    step4aOtherIncome:cleanNumber(rw.step4aOtherIncome ?? rw.otherIncome ?? 0),
+    deductions:cleanNumber(rw.deductions ?? rw.step4bDeductions ?? 0),
+    step4bDeductions:cleanNumber(rw.step4bDeductions ?? rw.deductions ?? 0),
+    extraWithholding:cleanNumber(rw.extraWithholding ?? rw.step4cExtraWithholding ?? 0),
+    step4cExtraWithholding:cleanNumber(rw.step4cExtraWithholding ?? rw.extraWithholding ?? 0),
+    exempt:!!rw.exempt,
   };
   out.selectedPayPeriod=raw.selectedPayPeriod||raw.payFrequency||"biweekly";
   return out;
@@ -70,6 +77,8 @@ export function validateInputs(sanitized){
   if (!['self','family'].includes(d.hsaCoverage)) errors.push({field:"hsaCoverage",message:"HSA coverage must be self or family"});
   for (const [k,v] of Object.entries(d)) { if (typeof v==="number" && !isFinite(v)) errors.push({field:k,message:`Invalid deduction ${k}`}); if (typeof v==="number" && v<0) errors.push({field:k,message:`Deduction ${k} cannot be negative`}); }
   for (const [k,v] of Object.entries(sanitized.federalDeductions)) if (typeof v==="number" && (!isFinite(v)||v<0)) errors.push({field:k,message:`Invalid federal deduction ${k}`});
+  const w=sanitized.w4;
+  for (const [k,v] of Object.entries({step3Amount:w.step3Amount,step4aOtherIncome:w.step4aOtherIncome,step4bDeductions:w.step4bDeductions,step4cExtraWithholding:w.step4cExtraWithholding})) if (!isFinite(v)||v<0) errors.push({field:k,message:`${k} must be zero or greater`});
   if (sanitized.federalDeductions.seniorDeductionEligible===true && sanitized.age<65) warnings.push({field:"seniorDeductionEligible",message:"Senior deduction eligibility was requested but age is under 65"});
   return {valid:errors.length===0,errors,warnings};
 }

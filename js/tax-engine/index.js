@@ -21,7 +21,7 @@ export function calculateAll(sanitizedInput){
   const payPeriods=calculatePayPeriods();
   const selectedFreq=sanitizedInput.selectedPayPeriod||"biweekly";
   const periodsPerYear=payPeriods[selectedFreq]||26;
-  const withholdingInfo=calculateFederalWithholding(taxableWages.federalTaxableWages,filingStatus,sanitizedInput.w4||{},periodsPerYear);
+  const withholdingInfo=calculateFederalWithholding(taxableWages.federalTaxableWages,filingStatus,sanitizedInput.w4||{},periodsPerYear,federalSpecial.totalAdditionalDeduction);
   const ficaInfo=calculateFICA(taxableWages.socialSecurityWages,taxableWages.medicareWages,filingStatus);
   const stateTaxableInfo=calculateStateTaxableIncome(taxableWages.stateTaxableWagesGross,stateAbbr,filingStatus);
   const stateTaxInfo=calculateStateTax(stateTaxableInfo.stateTaxableIncome,stateAbbr,filingStatus);
