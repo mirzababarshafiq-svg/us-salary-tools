@@ -48,7 +48,6 @@ export function calculateStatePayrollTaxes(grossWages,ficaWages,stateAbbr){
   const stateData=getState(stateAbbr);if (!stateData) throw new Error(`Unknown state ${stateAbbr}`);
   const payrollTaxes=stateData.employeePayrollTaxes||[];let total=0;const details=[];
   for (const pt of payrollTaxes){const base=pt.appliesTo==="grossWages"?grossWages:ficaWages;const wageBase=pt.wageBase;const taxable=wageBase?Math.min(base,wageBase):base;const tax=taxable*pt.rate;total+=tax;details.push({name:pt.name,rate:pt.rate,wageBase:wageBase,taxableWages:taxable,tax:Math.round(tax*100)/100,source:pt.source,confidence:pt.confidence});}
-  // 2026 employee payroll deductions that are currently published outside the generic state data.
   if (stateAbbr === "NY") {
     const pflTax = Math.min(grossWages * 0.00432, 411.91);
     total += pflTax;
@@ -72,17 +71,18 @@ export function calculateLocalTax(stateAbbr, options={}){
     const filingStatus=options.filingStatus||"single";
     const taxableWages=Number(options.stateTaxableIncome)||0;
     if (rule.type==="progressive") {
-      const deduction=(rule.standardDeduction||{})[filingStatus]||0;
-      const taxable=Math.max(0,taxableWages-deduction);
+      // stateTaxableIncome already reflects the state's standard deduction/exemptions;
+      // do not subtract a second local standard deduction here.
+      const taxable=Math.max(0,taxableWages);
       const brackets=rule.brackets[filingStatus]||rule.brackets.single||[];
       const tax=Math.round(bracketWalk(taxable,brackets)*100)/100;
-      return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxable,details:{type:rule.type,filingStatus,standardDeduction:deduction},note:`${rule.name} personal income tax modeled.` ,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
+      return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxable,details:{type:rule.type,filingStatus},note:`${rule.name} personal income tax modeled.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
     }
     const residency=String(options.residency||"resident").toLowerCase();
     const rate=residency==="nonresident"?(rule.nonResidentRate??rule.residentRate):rule.residentRate;
     const tax=Math.round(Math.max(0,taxableWages*rate)*100)/100;
     return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxableWages,residency,rate,details:{type:rule.type},note:`${rule.name} local income tax modeled.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
   }
-  if (!local || local.exists===false) return {exists:false,modeled:true,localIncomeTax:0,note:"No modeled local individual income tax for this state."};
-  return {exists:true,modeled:false,localIncomeTax:0,note:local.note||"Local/city/county income taxes are not included."};
+  if (!stateData?.localTax || stateData.localTax.exists===false) return {exists:false,modeled:true,localIncomeTax:0,note:"No modeled local individual income tax for this state."};
+  return {exists:true,modeled:false,localIncomeTax:0,note:stateData.localTax.note||"Local/city/county income taxes are not included."};
 }
