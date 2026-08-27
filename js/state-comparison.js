@@ -1,198 +1,261 @@
-/* State Tax Comparison Calculator — browser-safe (matches site's dynamic-import pattern) */
+/* State Tax Comparison Calculator — browser-safe and accessible */
 (function () {
   function el(id) { return document.getElementById(id); }
-
-  function money(n) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(n) || 0);
-  }
-  function percent(n) {
-    return (Number(n) || 0).toFixed(1) + '%';
-  }
-  function numberValue(id, fallback) {
+  function money(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(Number(n) || 0); }
+  function percent(n) { return (Number(n) || 0).toFixed(1) + '%'; }
+  function numberValue(id) {
     var node = el(id);
-    if (!node) return fallback || 0;
+    if (!node) return 0;
     var n = parseFloat(String(node.value || '').replace(/[$,\s]/g, ''));
-    return Number.isFinite(n) ? n : (fallback || 0);
+    return Number.isFinite(n) ? n : 0;
   }
-  function setText(id, value) {
-    var node = el(id);
-    if (node) node.textContent = value;
-  }
+  function setText(id, value) { var node = el(id); if (node) node.textContent = value; }
+  function getPeriods(frequency) { return { weekly: 52, biweekly: 26, semimonthly: 24, monthly: 12 }[frequency] || 26; }
+  function statePayrollPerPeriod(result, periods) { return (Number(result.state?.payroll?.totalStatePayrollTax) || 0) / periods; }
+  function stateIncomePerPeriod(result, periods) { return (Number(result.state?.stateIncomeTax) || 0) / periods; }
 
   var initialized = false;
   var requestToken = 0;
+  var debounceTimer = null;
+  var modulesPromise = null;
 
-  function populateStates(select, STATES_2026, preferred) {
+  function setBusy(busy) {
+    var form = el('sc-form');
+    var ledger = el('sc-ledger');
+    var button = el('sc-calculate-btn');
+    if (form) form.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (ledger) ledger.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (button) {
+      button.disabled = busy;
+      button.textContent = busy ? 'Comparing…' : 'Compare States';
+    }
+    setText('sc-status', busy ? 'Comparing both states…' : '');
+  }
+
+  function setError(message) {
+    setText('err-sc-salary', message || '');
+    if (message) setText('sc-status', message);
+  }
+
+  function populateStates(select, states, preferred) {
     if (!select || select.options.length) return;
-    var codes = Object.keys(STATES_2026).sort(function (a, b) {
-      return String(STATES_2026[a].name || a).localeCompare(String(STATES_2026[b].name || b));
+    Object.keys(states).sort(function (a, b) {
+      return String(states[a].name || a).localeCompare(String(states[b].name || b));
+    }).forEach(function (abbr) {
+      var option = document.createElement('option');
+      option.value = abbr;
+      option.textContent = states[abbr].name || abbr;
+      select.appendChild(option);
     });
-    codes.forEach(function (abbr) {
-      var opt = document.createElement('option');
-      opt.value = abbr;
-      opt.textContent = STATES_2026[abbr].name || abbr;
-      if (abbr === preferred) opt.selected = true;
-      select.appendChild(opt);
-    });
+    if (preferred && states[preferred]) select.value = preferred;
+  }
+
+  function loadModules() {
+    if (!modulesPromise) {
+      modulesPromise = Promise.all([
+        import('./tax-engine/index.js'),
+        import('../data/states-2026.js')
+      ]);
+    }
+    return modulesPromise;
+  }
+
+  async function calculate() {
+    var token = ++requestToken;
+    clearErrors();
+    var salary = numberValue('sc-salary');
+    if (salary <= 0) {
+      var ledger = el('sc-ledger');
+      if (ledger) ledger.hidden = true;
+      setError('Please enter a salary greater than $0.');
+      return;
+    }
+
+    setBusy(true);
+    try {
+      var loaded = await loadModules();
+      var engine = loaded[0];
+      var statesModule = loaded[1];
+      if (token !== requestToken) return;
+
+      populateStates(el('sc-state-a'), statesModule.STATES_2026, 'TX');
+      populateStates(el('sc-state-b'), statesModule.STATES_2026, 'CA');
+
+      var filingStatus = el('sc-filing-status') ? el('sc-filing-status').value : 'single';
+      var frequency = el('sc-frequency') ? el('sc-frequency').value : 'biweekly';
+      var stateA = el('sc-state-a') ? el('sc-state-a').value : 'TX';
+      var stateB = el('sc-state-b') ? el('sc-state-b').value : 'CA';
+      var base = {
+        grossAnnual: salary,
+        filingStatus: filingStatus,
+        payFrequency: 'annual',
+        selectedPayPeriod: frequency,
+        deductions: {},
+        w4: {}
+      };
+      var resultA = engine.calculateAll(engine.sanitizeInputs(Object.assign({}, base, { state: stateA })));
+      var resultB = engine.calculateAll(engine.sanitizeInputs(Object.assign({}, base, { state: stateB })));
+      if (token !== requestToken) return;
+
+      if (resultA.error || resultB.error) {
+        setError('Please check your inputs and try again.');
+        var failedLedger = el('sc-ledger');
+        if (failedLedger) failedLedger.hidden = true;
+        return;
+      }
+      render(resultA, resultB, statesModule.STATES_2026, frequency);
+    } catch (err) {
+      if (token !== requestToken) return;
+      if (window.console && console.error) console.error('state comparison failed:', err);
+      var failed = el('sc-ledger');
+      if (failed) failed.hidden = true;
+      setError("Couldn't load comparison, please try again.");
+    } finally {
+      if (token === requestToken) setBusy(false);
+    }
+  }
+
+  function render(a, b, states, frequency) {
+    var ledger = el('sc-ledger');
+    if (!ledger) return;
+    var periods = getPeriods(frequency);
+    var nameA = (states[a.stateAbbr] && states[a.stateAbbr].name) || a.stateAbbr;
+    var nameB = (states[b.stateAbbr] && states[b.stateAbbr].name) || b.stateAbbr;
+    var aFederal = Number(a.federal.withholding?.federalWithholdingPerPeriod) || (Number(a.federal.federalIncomeTax) || 0) / periods;
+    var bFederal = Number(b.federal.withholding?.federalWithholdingPerPeriod) || (Number(b.federal.federalIncomeTax) || 0) / periods;
+    var aState = stateIncomePerPeriod(a, periods);
+    var bState = stateIncomePerPeriod(b, periods);
+    var aPayroll = statePayrollPerPeriod(a, periods);
+    var bPayroll = statePayrollPerPeriod(b, periods);
+    var aFica = (Number(a.fica.totalForNetPay) || 0) / periods;
+    var bFica = (Number(b.fica.totalForNetPay) || 0) / periods;
+
+    setText('sc-head-a', nameA);
+    setText('sc-head-b', nameB);
+    setText('sc-a-gross', money(a.totals.grossPerSelectedPeriod));
+    setText('sc-b-gross', money(b.totals.grossPerSelectedPeriod));
+    setText('sc-a-federal', money(aFederal));
+    setText('sc-b-federal', money(bFederal));
+    setText('sc-a-state', money(aState));
+    setText('sc-b-state', money(bState));
+    setText('sc-a-state-payroll', money(aPayroll));
+    setText('sc-b-state-payroll', money(bPayroll));
+    setText('sc-a-fica', money(aFica));
+    setText('sc-b-fica', money(bFica));
+    setText('sc-a-net', money(a.totals.netPerSelectedPeriod));
+    setText('sc-b-net', money(b.totals.netPerSelectedPeriod));
+    setText('sc-a-annual-gross', money(a.totals.grossAnnual));
+    setText('sc-b-annual-gross', money(b.totals.grossAnnual));
+    setText('sc-a-annual-net', money(a.totals.netAnnual));
+    setText('sc-b-annual-net', money(b.totals.netAnnual));
+    setText('sc-a-rate', percent(a.totals.effectiveTaxRate));
+    setText('sc-b-rate', percent(b.totals.effectiveTaxRate));
+
+    var diff = (Number(a.totals.netAnnual) || 0) - (Number(b.totals.netAnnual) || 0);
+    var summary = el('sc-summary');
+    if (summary) {
+      if (Math.abs(diff) < 1) {
+        summary.textContent = 'You would take home about the same amount in ' + nameA + ' and ' + nameB + '.';
+      } else {
+        var winner = diff > 0 ? nameA : nameB;
+        var loser = diff > 0 ? nameB : nameA;
+        summary.textContent = 'You would take home ' + money(Math.abs(diff)) + ' more per year in ' + winner + ' than in ' + loser + '.';
+      }
+    }
+
+    var note = [];
+    if (a.local?.modeled === false || b.local?.modeled === false) note.push('Some city/county/local income taxes are not modeled, so actual take-home pay may differ.');
+    if (a.state?.confidence !== 'verified' || b.state?.confidence !== 'verified') note.push('One or both state estimates use modeled/estimated state rules.');
+    setText('sc-note', note.join(' '));
+
+    ledger.hidden = false;
+    window.__lastComparisonResult = { a: a, b: b, nameA: nameA, nameB: nameB, frequency: frequency };
   }
 
   function clearErrors() {
     var e = el('err-sc-salary');
     if (e) e.textContent = '';
+    setText('sc-status', '');
   }
 
-  async function calculate() {
-    var myToken = ++requestToken;
-    clearErrors();
-    try {
-      var engine = await import('./tax-engine/index.js');
-      var statesModule = await import('../data/states-2026.js');
-      if (myToken !== requestToken) return;
-
-      populateStates(el('sc-state-a'), statesModule.STATES_2026, 'TX');
-      populateStates(el('sc-state-b'), statesModule.STATES_2026, 'CA');
-
-      var salary = numberValue('sc-salary', 0);
-      if (salary <= 0) {
-        var ledgerEl = el('sc-ledger');
-        if (ledgerEl) ledgerEl.hidden = true;
-        return;
-      }
-      var filingStatus = el('sc-filing-status') ? el('sc-filing-status').value : 'single';
-      var stateA = el('sc-state-a') ? el('sc-state-a').value : 'TX';
-      var stateB = el('sc-state-b') ? el('sc-state-b').value : 'CA';
-
-      var base = {
-        grossAnnual: salary,
-        filingStatus: filingStatus,
-        payFrequency: 'annual',
-        selectedPayPeriod: 'monthly',
-        deductions: {},
-        w4: {}
-      };
-      var sanitizedA = engine.sanitizeInputs(Object.assign({}, base, { state: stateA }));
-      var sanitizedB = engine.sanitizeInputs(Object.assign({}, base, { state: stateB }));
-      var resultA = engine.calculateAll(sanitizedA);
-      var resultB = engine.calculateAll(sanitizedB);
-      if (myToken !== requestToken) return;
-
-      if (resultA.error || resultB.error) {
-        var errNote = el('err-sc-salary');
-        if (errNote) {
-          var msgs = (resultA.errors || resultB.errors || []).map(function (e) { return e.message; }).join(' · ');
-          errNote.textContent = msgs || 'Please check your inputs.';
-        }
-        var ledgerErr = el('sc-ledger');
-        if (ledgerErr) ledgerErr.hidden = true;
-        return;
-      }
-
-      render(resultA, resultB, statesModule.STATES_2026);
-    } catch (err) {
-      if (myToken !== requestToken) return;
-      if (window.console && console.error) console.error('state comparison failed:', err);
-      var errNote2 = el('err-sc-salary');
-      if (errNote2) errNote2.textContent = 'Calculator error: ' + (err && err.message ? err.message : 'unknown error');
-    }
+  function scheduleCalculate() {
+    window.clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(calculate, 180);
   }
 
-  function render(a, b, STATES_2026) {
-    var ledger = el('sc-ledger');
-    if (!ledger) return;
-    try {
-      var nameA = (STATES_2026[a.stateAbbr] && STATES_2026[a.stateAbbr].name) || a.stateAbbr;
-      var nameB = (STATES_2026[b.stateAbbr] && STATES_2026[b.stateAbbr].name) || b.stateAbbr;
-
-      setText('sc-head-a', nameA);
-      setText('sc-head-b', nameB);
-
-      setText('sc-a-gross', money(a.grossAnnual));
-      setText('sc-b-gross', money(b.grossAnnual));
-      setText('sc-a-federal', money(a.federal.federalIncomeTax));
-      setText('sc-b-federal', money(b.federal.federalIncomeTax));
-      setText('sc-a-state', money(a.state.stateIncomeTax));
-      setText('sc-b-state', money(b.state.stateIncomeTax));
-      setText('sc-a-fica', money(a.fica.totalForNetPay));
-      setText('sc-b-fica', money(b.fica.totalForNetPay));
-      setText('sc-a-net', money(a.totals.netAnnual));
-      setText('sc-b-net', money(b.totals.netAnnual));
-      setText('sc-a-net-monthly', money(a.totals.netMonthly));
-      setText('sc-b-net-monthly', money(b.totals.netMonthly));
-      setText('sc-a-rate', percent(a.totals.effectiveTaxRate));
-      setText('sc-b-rate', percent(b.totals.effectiveTaxRate));
-
-      var diff = a.totals.netAnnual - b.totals.netAnnual;
-      var summary = el('sc-summary');
-      if (summary) {
-        if (Math.abs(diff) < 1) {
-          summary.innerHTML = '<span class="ledger__label">Result</span><span class="ledger__value" style="font-size:1.3rem;">' + nameA + ' and ' + nameB + ' net about the same take-home pay.</span>';
-        } else {
-          var winner = diff > 0 ? nameA : nameB;
-          summary.innerHTML = '<span class="ledger__label">You would take home more in</span><span class="ledger__value" style="font-size:2rem;">' + winner + '</span><span class="ledger__label" style="margin-top:4px;">' + money(Math.abs(diff)) + ' more per year</span>';
-        }
-      }
-
-      ledger.hidden = false;
-      window.__lastComparisonResult = { a: a, b: b, nameA: nameA, nameB: nameB };
-    } catch (renderErr) {
-      if (window.console && console.error) console.error('render() failed:', renderErr);
-    }
+  function swapStates() {
+    var a = el('sc-state-a');
+    var b = el('sc-state-b');
+    if (!a || !b) return;
+    var value = a.value;
+    a.value = b.value;
+    b.value = value;
+    scheduleCalculate();
   }
 
   function resetForm() {
     var form = el('sc-form');
     if (form) form.reset();
+    var a = el('sc-state-a');
+    var b = el('sc-state-b');
+    if (a) a.value = 'TX';
+    if (b) b.value = 'CA';
+    var frequency = el('sc-frequency');
+    if (frequency) frequency.value = 'biweekly';
     var ledger = el('sc-ledger');
     if (ledger) ledger.hidden = true;
     clearErrors();
     window.__lastComparisonResult = null;
+    setBusy(false);
   }
 
   function init() {
     if (initialized) return;
-    initialized = true;
     var form = el('sc-form');
     if (!form) return;
+    initialized = true;
 
-    ['sc-salary', 'sc-filing-status', 'sc-state-a', 'sc-state-b'].forEach(function (id) {
+    loadModules().then(function (loaded) {
+      var states = loaded[1].STATES_2026;
+      populateStates(el('sc-state-a'), states, 'TX');
+      populateStates(el('sc-state-b'), states, 'CA');
+      setText('sc-status', '');
+    }).catch(function () {
+      setError("Couldn't load comparison, please try again.");
+    });
+
+    var salary = el('sc-salary');
+    var selects = ['sc-frequency', 'sc-filing-status', 'sc-state-a', 'sc-state-b'];
+    if (salary) salary.addEventListener('input', scheduleCalculate);
+    selects.forEach(function (id) {
       var node = el(id);
-      if (node) {
-        node.addEventListener('input', calculate);
-        node.addEventListener('change', calculate);
-      }
+      if (node) node.addEventListener('change', scheduleCalculate);
     });
+    form.addEventListener('submit', function (e) { e.preventDefault(); calculate(); });
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      calculate();
-    });
+    var swap = el('sc-swap-btn');
+    if (swap) swap.addEventListener('click', swapStates);
+    var reset = el('sc-reset-btn');
+    if (reset) reset.addEventListener('click', resetForm);
 
-    var resetBtn = el('sc-reset-btn');
-    if (resetBtn) resetBtn.addEventListener('click', resetForm);
-
-    var copyBtn = el('sc-copy-btn');
-    if (copyBtn) copyBtn.addEventListener('click', function () {
+    var copy = el('sc-copy-btn');
+    if (copy) copy.addEventListener('click', function () {
       var r = window.__lastComparisonResult;
       if (!r) return;
       var text = [
         r.nameA + ' vs ' + r.nameB,
-        r.nameA + ' Net Annual: ' + money(r.a.totals.netAnnual),
-        r.nameB + ' Net Annual: ' + money(r.b.totals.netAnnual),
-        'Difference: ' + money(Math.abs(r.a.totals.netAnnual - r.b.totals.netAnnual))
+        'Pay frequency: ' + r.frequency,
+        r.nameA + ' Net Pay: ' + money(r.a.totals.netPerSelectedPeriod) + ' per period',
+        r.nameB + ' Net Pay: ' + money(r.b.totals.netPerSelectedPeriod) + ' per period',
+        'Difference: ' + money(Math.abs((r.a.totals.netAnnual || 0) - (r.b.totals.netAnnual || 0))) + ' per year'
       ].join('\n');
       if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function () {});
     });
 
-    var printBtn = el('sc-print-btn');
-    if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
-
-    // Pre-populate the state dropdowns immediately so they're not empty before first calc
-    calculate();
+    var print = el('sc-print-btn');
+    if (print) print.addEventListener('click', function () { window.print(); });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
