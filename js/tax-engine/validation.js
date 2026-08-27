@@ -24,6 +24,8 @@ export function sanitizeInputs(raw={}){
   out.age=cleanNumber(raw.age ?? 0);
   out.isBlind=!!raw.isBlind;
   out.age65=!!raw.age65;
+  out.localJurisdiction=String(raw.localJurisdiction||raw.localTaxJurisdiction||"").toUpperCase();
+  out.localResidency=String(raw.localResidency||"resident").toLowerCase();
   out.deductions={
     traditional401k:cleanNumber(raw.deductions?.traditional401k ?? raw.traditional401k ?? 0),
     roth401k:cleanNumber(raw.deductions?.roth401k ?? 0),
@@ -68,6 +70,7 @@ export function validateInputs(sanitized){
   if (!["single","marriedJointly","marriedSeparately","headOfHousehold"].includes(filingStatus)) errors.push({field:"filingStatus",message:"Invalid filing status"});
   if (!state) errors.push({field:"state",message:"Select a state before calculating state/local taxes"});
   else if (!STATES_2026[state]) errors.push({field:"state",message:`Unknown state code ${state}`});
+  if (!["resident","nonresident"].includes(sanitized.localResidency)) warnings.push({field:"localResidency",message:"Unknown local residency type; resident treatment used"});
   if (hoursPerWeek<0 || hoursPerWeek>168) errors.push({field:"hoursPerWeek",message:"Hours per week 0-168"});
   if (weeksPerYear<0 || weeksPerYear>52) errors.push({field:"weeksPerYear",message:"Weeks per year 0-52"});
   const d=sanitized.deductions;
