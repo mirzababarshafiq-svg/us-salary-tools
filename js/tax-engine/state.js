@@ -31,37 +31,29 @@ export function calculateStateTax(stateTaxableIncome,stateAbbr,filingStatus){
   const stateData=getState(stateAbbr);
   if (!stateData) throw new Error(`Unknown state ${stateAbbr}`);
   if (stateData.system==="none") return {stateAbbr,stateName:stateData.name,system:"none",stateTaxableIncome,stateIncomeTax:0,flatRate:null,confidence:stateData.confidence,source:stateData.source,sourceUrl:stateData.sourceUrl,notes:stateData.notes,localTax:stateData.localTax};
-  let tax=0;let bracketsUsed=null;
+  let tax=0;let bracketsUsed=null;let statusWarning=null;
   if (stateData.system==="flat"){
     const rate=stateData.flatRate||0;tax=stateTaxableIncome*rate;bracketsUsed=[{min:0,max:Infinity,rate}];
   } else {
-    const filingBrackets=stateData.brackets?.[filingStatus];
-    if (!filingBrackets && !stateData.brackets?.single) return {stateAbbr,stateName:stateData.name,system:stateData.system,stateTaxableIncome,stateIncomeTax:0,confidence:"estimate",source:stateData.source,sourceUrl:stateData.sourceUrl,notes:`No ${filingStatus} state brackets are modeled.`};
-    const brackets=filingBrackets?.length?filingBrackets:(stateData.brackets.single||[]);
+    const singleBrackets=stateData.brackets?.single||[];
+    const ownBrackets=stateData.brackets?.[filingStatus];
+    let brackets=ownBrackets?.length?ownBrackets:singleBrackets;
+    if (!ownBrackets && (filingStatus==="headOfHousehold"||filingStatus==="marriedSeparately")) statusWarning=`State income tax for ${filingStatus} is not separately modeled; Single brackets were used.`;
+    if (filingStatus==="marriedJointly" && ownBrackets?.length && JSON.stringify(ownBrackets)===JSON.stringify(singleBrackets)) {
+      const mfjDeduction=stateData.standardDeduction?.marriedJointly;
+      if (!mfjDeduction) statusWarning="State income tax for marriedJointly is not separately modeled; Single brackets were used.";
+    }
+    if (!brackets.length) return {stateAbbr,stateName:stateData.name,system:stateData.system,stateTaxableIncome,stateIncomeTax:0,confidence:"estimate",source:stateData.source,sourceUrl:stateData.sourceUrl,notes:stateData.notes,statusWarning:`State income tax for ${filingStatus} could not be modeled.`};
     bracketsUsed=brackets;tax=bracketWalk(stateTaxableIncome,brackets);
     if (stateData.addOnTaxes?.length) for (const addOn of stateData.addOnTaxes) if (addOn.threshold && stateTaxableIncome>addOn.threshold) tax+=(stateTaxableIncome-addOn.threshold)*addOn.rate;
   }
   tax=Math.max(0,tax);
-  return {stateAbbr,stateName:stateData.name,system:stateData.system,stateTaxableIncome,stateIncomeTax:Math.round(tax*100)/100,brackets:bracketsUsed,flatRate:stateData.flatRate,confidence:stateData.confidence,source:stateData.source,sourceUrl:stateData.sourceUrl,notes:stateData.notes,localTax:stateData.localTax};
+  return {stateAbbr,stateName:stateData.name,system:stateData.system,stateTaxableIncome,stateIncomeTax:Math.round(tax*100)/100,brackets:bracketsUsed,flatRate:stateData.flatRate,confidence:stateData.confidence,source:stateData.source,sourceUrl:stateData.sourceUrl,notes:stateData.notes,localTax:stateData.localTax,statusWarning};
 }
 export function calculateStatePayrollTaxes(grossWages,ficaWages,stateAbbr){
   const stateData=getState(stateAbbr);if (!stateData) throw new Error(`Unknown state ${stateAbbr}`);
   const payrollTaxes=stateData.employeePayrollTaxes||[];let total=0;const details=[];
   for (const pt of payrollTaxes){const base=pt.appliesTo==="grossWages"?grossWages:ficaWages;const wageBase=pt.wageBase;const taxable=wageBase?Math.min(base,wageBase):base;const tax=taxable*pt.rate;total+=tax;details.push({name:pt.name,rate:pt.rate,wageBase:wageBase,taxableWages:taxable,tax:Math.round(tax*100)/100,source:pt.source,confidence:pt.confidence});}
-  if (stateAbbr === "NY") {
-    const pflTax = Math.min(grossWages * 0.00432, 411.91);
-    total += pflTax;
-    details.push({name:"NY Paid Family Leave",rate:0.00432,wageBase:null,taxableWages:grossWages,tax:Math.round(pflTax*100)/100,source:"NYS 2026 Paid Family Leave",confidence:"verified"});
-  }
-  if (stateAbbr === "WA") {
-    const pfmlBase = Math.min(grossWages,184500);
-    const pfmlTax = pfmlBase * 0.0113 * 0.7143;
-    total += pfmlTax;
-    details.push({name:"WA Paid Family & Medical Leave",rate:0.0113*0.7143,wageBase:184500,taxableWages:pfmlBase,tax:Math.round(pfmlTax*100)/100,source:"Washington PFML 2026 employee share",confidence:"verified"});
-    const caresTax = grossWages * 0.0058;
-    total += caresTax;
-    details.push({name:"WA Cares",rate:0.0058,wageBase:null,taxableWages:grossWages,tax:Math.round(caresTax*100)/100,source:"WA Cares 2026 employee premium",confidence:"verified"});
-  }
   return {stateAbbr,totalStatePayrollTax:Math.round(total*100)/100,details};
 }
 export function calculateLocalTax(stateAbbr, options={}){
@@ -70,15 +62,14 @@ export function calculateLocalTax(stateAbbr, options={}){
   if (rule && rule.state===stateAbbr) {
     const filingStatus=options.filingStatus||"single";
     const taxableWages=Number(options.stateTaxableIncome)||0;
+    const residency=String(options.residency||"resident").toLowerCase();
+    if (rule.residentOnly && residency==="nonresident") return {exists:true,modeled:true,jurisdiction,localIncomeTax:0,taxableIncome:taxableWages,residency,details:{type:rule.type,filingStatus},note:`${rule.name} PIT is resident-only.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
     if (rule.type==="progressive") {
-      // stateTaxableIncome already reflects the state's standard deduction/exemptions;
-      // do not subtract a second local standard deduction here.
       const taxable=Math.max(0,taxableWages);
       const brackets=rule.brackets[filingStatus]||rule.brackets.single||[];
       const tax=Math.round(bracketWalk(taxable,brackets)*100)/100;
       return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxable,details:{type:rule.type,filingStatus},note:`${rule.name} personal income tax modeled.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
     }
-    const residency=String(options.residency||"resident").toLowerCase();
     const rate=residency==="nonresident"?(rule.nonResidentRate??rule.residentRate):rule.residentRate;
     const tax=Math.round(Math.max(0,taxableWages*rate)*100)/100;
     return {exists:true,modeled:true,jurisdiction,localIncomeTax:tax,taxableIncome:taxableWages,residency,rate,details:{type:rule.type},note:`${rule.name} local income tax modeled.`,source:rule.source,sourceUrl:rule.sourceUrl,confidence:rule.confidence};
