@@ -73,7 +73,7 @@
   async function calculate() {
     var token = ++requestToken;
     try {
-      var loaded = await Promise.all([import('./tax-engine/index.js?v=2026.2.0'), import('../data/states-2026.js?v=2026.2.0')]);
+      var loaded = await Promise.all([import('./tax-engine/index.js'), import('../data/states-2026.js')]);
       if (token !== requestToken) return;
       var engine = loaded[0], statesModule = loaded[1]; ensureStates(statesModule.STATES_2026); ensureLocalControls(); refreshLocalOptions();
       var raw = { grossAnnual: numberValue('pc-salary', 0), state: (el('pc-state') && el('pc-state').value) || 'TX', filingStatus: (el('pc-filing-status') && el('pc-filing-status').value) || 'single', payFrequency: 'annual', selectedPayPeriod: (el('pc-frequency') && el('pc-frequency').value) || 'biweekly', age: 0, localJurisdiction: (el('pc-local') && el('pc-local').value) || '', localResidency: (el('pc-local-residency') && el('pc-local-residency').value) || 'resident', deductions: { traditional401kPercent: numberValue('pc-401k', 0), hsa: numberValue('pc-hsa', 0), hsaCoverage: (el('pc-hsa-coverage') && el('pc-hsa-coverage').value) || 'self', healthPremiums: numberValue('pc-health-premiums', 0) }, w4: {} };
