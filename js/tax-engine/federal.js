@@ -92,7 +92,7 @@ export function calculateFederalWithholding(federalTaxableWages,filingStatus,w4=
   }
 
   const standardAdj=filingStatus==="marriedJointly"?WITHHOLDING_2026.standardAdjustment.marriedJointly:WITHHOLDING_2026.standardAdjustment.other;
-  const adjustedAnnual=Math.max(0,(Math.max(0,federalTaxableWages)*normalizedPeriods)+step4a-specialDeductions-step4b-standardAdj*(multipleJobs?0:1));
+  const adjustedAnnual=Math.max(0,Math.max(0,federalTaxableWages)+step4a-specialDeductions-step4b-standardAdj*(multipleJobs?0:1));
   const scheduleSet=WITHHOLDING_2026.schedules[filingStatus]||WITHHOLDING_2026.schedules.single;
   const schedule=multipleJobs?scheduleSet.step2:scheduleSet.standard;
   const annualTableTax=scheduleAmount(adjustedAnnual,schedule);
