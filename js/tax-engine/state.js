@@ -1,6 +1,15 @@
 import { STATES_2026 } from "../../data/states-2026.js";
 import { LOCAL_TAX_RULES_2026 } from "../../data/local-tax-rules-2026.js";
-function getState(stateAbbr){ return STATES_2026[stateAbbr]; }
+function getState(stateAbbr){
+const s = STATES_2026[stateAbbr];
+if (!s) return s;
+if (stateAbbr === "OH") return Object.assign({}, s, { system: "progressive" });
+if (stateAbbr === "MS") return Object.assign({}, s, {
+system: "progressive",
+personalExemption: { type: "exemption", single: 6000, marriedJointly: 12000, headOfHousehold: 9500 }
+});
+return s;
+}
 function bracketWalk(taxableIncome,brackets){
   if (taxableIncome<=0) return 0;
   let tax=0;
