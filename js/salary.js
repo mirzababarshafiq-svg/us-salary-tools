@@ -30,7 +30,6 @@
     form.addEventListener('submit',function(e){e.preventDefault();calculate()});
     if(el('salary-reset-btn'))el('salary-reset-btn').addEventListener('click',function(){if(el('salary-annual'))el('salary-annual').value='';if(el('salary-hourly'))el('salary-hourly').value='';if(el('salary-hours'))el('salary-hours').value='40';if(el('salary-weeks'))el('salary-weeks').value='52';setMode('annual')});
     if(el('salary-copy-btn'))el('salary-copy-btn').addEventListener('click',function(){var v=calculate();var text=['Annual: '+money(v.annually),'Monthly: '+money(v.monthly),'Biweekly: '+money(v.biweekly),'Weekly: '+money(v.weekly),'Daily: '+money(v.daily),'Hourly: '+money(v.hourly)].join('\n');if(window.copyToClipboard)window.copyToClipboard(text)});
-    document.querySelectorAll('.faq-item__q').forEach(function(q){q.addEventListener('click',function(){var item=q.closest('.faq-item'),open=item&&item.getAttribute('data-open')==='true';if(item)item.setAttribute('data-open',open?'false':'true');q.setAttribute('aria-expanded',open?'false':'true')})});
     calculate();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

@@ -25,7 +25,9 @@
     if (!(hours >= 0 && hours <= 168)) { var eh = el('err-stoh-hours'); if (eh) eh.textContent = 'Hours per week 0-168'; hasError = true; }
     if (!(weeks >= 0 && weeks <= 52)) { var ew = el('err-stoh-weeks'); if (ew) ew.textContent = 'Weeks per year 0-52'; hasError = true; }
 
-    if (hasError || !salary) {
+    if (hasError || !(salary > 0)) {
+      var es = el('err-stoh-salary');
+      if (es && !(salary > 0)) es.textContent = 'Please enter a salary greater than $0.';
       if (ledger) ledger.hidden = true;
       return;
     }
