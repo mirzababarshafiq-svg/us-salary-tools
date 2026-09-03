@@ -25,8 +25,8 @@ jobs:
           python3 <<'PY'
           import json
           import re
-          from pathlib import Path
           import subprocess
+          from pathlib import Path
 
           files = [
               Path('salary-calculator.html'),
@@ -51,8 +51,8 @@ jobs:
               ],
           }
 
-          script_re = re.compile(r'<script type="application/ld\\+json">.*?</script>', re.S)
-          body_re = re.compile(r'<script type="application/ld\\+json">(.*?)</script>', re.S)
+          script_re = re.compile(r'<script type="application/ld\+json">.*?</script>', re.S)
+          body_re = re.compile(r'<script type="application/ld\+json">(.*?)</script>', re.S)
 
           for path in files:
               text = path.read_text(encoding='utf-8')
@@ -96,4 +96,4 @@ jobs:
           git add salary-calculator.html hourly-to-salary.html raise-calculator.html
           git commit -m "Fix unparsable FAQ JSON-LD quotes on calculator pages"
           git push origin HEAD:main
-# trigger
+# trigger-again
