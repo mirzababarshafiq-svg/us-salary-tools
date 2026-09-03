@@ -26,6 +26,7 @@ jobs:
           import json
           import re
           from pathlib import Path
+          import subprocess
 
           files = [
               Path('salary-calculator.html'),
@@ -51,11 +52,11 @@ jobs:
           }
 
           script_re = re.compile(r'<script type="application/ld\\+json">.*?</script>', re.S)
+          body_re = re.compile(r'<script type="application/ld\\+json">(.*?)</script>', re.S)
 
           for path in files:
               text = path.read_text(encoding='utf-8')
-              scripts = script_re.findall(text)
-              faq_scripts = [s for s in scripts if '"@type": "FAQPage"' in s]
+              faq_scripts = [s for s in script_re.findall(text) if '"@type": "FAQPage"' in s]
               if len(faq_scripts) != 1:
                   raise SystemExit(f'{path}: expected exactly one FAQPage JSON-LD block, found {len(faq_scripts)}')
 
@@ -69,20 +70,19 @@ jobs:
               if '<a class="link"' in faq_after:
                   raise SystemExit(f'{path}: FAQ JSON-LD still contains an HTML link tag')
 
-              parsed = json.loads(re.search(r'<script type="application/ld\\+json">(.*?)</script>', faq_after, re.S).group(1))
+              parsed = json.loads(body_re.search(faq_after).group(1))
               if parsed.get('@type') != 'FAQPage':
                   raise SystemExit(f'{path}: parsed block is not FAQPage')
 
-              updated_text = text.replace(faq_before, faq_after, 1)
-              path.write_text(updated_text, encoding='utf-8')
+              path.write_text(text.replace(faq_before, faq_after, 1), encoding='utf-8')
 
               final_text = path.read_text(encoding='utf-8')
-              final_scripts = [s for s in script_re.findall(final_text) if '"@type": "FAQPage"' in s]
-              if len(final_scripts) != 1:
-                  raise SystemExit(f'{path}: final FAQPage JSON-LD block count is {len(final_scripts)}')
-              json.loads(re.search(r'<script type="application/ld\\+json">(.*?)</script>', final_scripts[0], re.S).group(1))
+              final_faq = [s for s in script_re.findall(final_text) if '"@type": "FAQPage"' in s]
+              if len(final_faq) != 1:
+                  raise SystemExit(f'{path}: final FAQPage JSON-LD block count is {len(final_faq)}')
+              json.loads(body_re.search(final_faq[0]).group(1))
 
-          changed = set(__import__('subprocess').check_output(['git', 'diff', '--name-only'], text=True).splitlines())
+          changed = set(subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines())
           expected = {str(p) for p in files}
           if changed != expected:
               raise SystemExit(f'Unexpected changed files: {sorted(changed)}')
@@ -96,3 +96,4 @@ jobs:
           git add salary-calculator.html hourly-to-salary.html raise-calculator.html
           git commit -m "Fix unparsable FAQ JSON-LD quotes on calculator pages"
           git push origin HEAD:main
+# trigger
