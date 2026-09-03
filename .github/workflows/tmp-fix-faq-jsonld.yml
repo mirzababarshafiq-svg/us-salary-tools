@@ -1,0 +1,98 @@
+name: Temporary FAQ JSON-LD fix
+
+on:
+  push:
+    branches:
+      - tmp-fix-faq-jsonld
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fix FAQ JSON-LD links and validate JSON
+        shell: bash
+        run: |
+          python3 <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          files = [
+              Path('salary-calculator.html'),
+              Path('hourly-to-salary.html'),
+              Path('raise-calculator.html'),
+          ]
+
+          replacements = {
+              'salary-calculator.html': [
+                  ('<a class="link" href="/paycheck-calculator">Paycheck Calculator</a>',
+                   'Paycheck Calculator at https://ussalarytools.com/paycheck-calculator')
+              ],
+              'hourly-to-salary.html': [
+                  ('<a class="link" href="/overtime-calculator">Overtime Calculator</a>',
+                   'Overtime Calculator at https://ussalarytools.com/overtime-calculator'),
+                  ('<a class="link" href="/paycheck-calculator">Paycheck Calculator</a>',
+                   'Paycheck Calculator at https://ussalarytools.com/paycheck-calculator')
+              ],
+              'raise-calculator.html': [
+                  ('<a class="link" href="/paycheck-calculator">Paycheck Calculator</a>',
+                   'Paycheck Calculator at https://ussalarytools.com/paycheck-calculator')
+              ],
+          }
+
+          script_re = re.compile(r'<script type="application/ld\\+json">.*?</script>', re.S)
+
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              scripts = script_re.findall(text)
+              faq_scripts = [s for s in scripts if '"@type": "FAQPage"' in s]
+              if len(faq_scripts) != 1:
+                  raise SystemExit(f'{path}: expected exactly one FAQPage JSON-LD block, found {len(faq_scripts)}')
+
+              faq_before = faq_scripts[0]
+              faq_after = faq_before
+              for old, new in replacements[path.name]:
+                  faq_after = faq_after.replace(old, new)
+
+              if faq_after == faq_before:
+                  raise SystemExit(f'{path}: no FAQ JSON-LD replacement was made')
+              if '<a class="link"' in faq_after:
+                  raise SystemExit(f'{path}: FAQ JSON-LD still contains an HTML link tag')
+
+              parsed = json.loads(re.search(r'<script type="application/ld\\+json">(.*?)</script>', faq_after, re.S).group(1))
+              if parsed.get('@type') != 'FAQPage':
+                  raise SystemExit(f'{path}: parsed block is not FAQPage')
+
+              updated_text = text.replace(faq_before, faq_after, 1)
+              path.write_text(updated_text, encoding='utf-8')
+
+              final_text = path.read_text(encoding='utf-8')
+              final_scripts = [s for s in script_re.findall(final_text) if '"@type": "FAQPage"' in s]
+              if len(final_scripts) != 1:
+                  raise SystemExit(f'{path}: final FAQPage JSON-LD block count is {len(final_scripts)}')
+              json.loads(re.search(r'<script type="application/ld\\+json">(.*?)</script>', final_scripts[0], re.S).group(1))
+
+          changed = set(__import__('subprocess').check_output(['git', 'diff', '--name-only'], text=True).splitlines())
+          expected = {str(p) for p in files}
+          if changed != expected:
+              raise SystemExit(f'Unexpected changed files: {sorted(changed)}')
+          PY
+
+      - name: Commit and push to main
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add salary-calculator.html hourly-to-salary.html raise-calculator.html
+          git commit -m "Fix unparsable FAQ JSON-LD quotes on calculator pages"
+          git push origin HEAD:main
