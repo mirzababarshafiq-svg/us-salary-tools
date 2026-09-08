@@ -3,6 +3,7 @@
   var CONSENT_KEY = 'cookieConsent';
   var BEACON_TOKEN = '3359fed1fd644e00a185d00270fbf781';
   var THEME_KEY = 'theme';
+  var GA_MEASUREMENT_ID = 'G-S1144DGY8P';
 
   function getPreferredTheme() {
     try {
@@ -45,13 +46,36 @@
     else headerInner.appendChild(btn);
   }
 
-  function loadAnalytics() {
+  function loadCloudflareAnalytics() {
     if (document.querySelector('script[data-cf-beacon]')) return;
     var script = document.createElement('script');
     script.type = 'module';
     script.src = 'https://static.cloudflareinsights.com/beacon.min.js';
     script.setAttribute('data-cf-beacon', JSON.stringify({ token: BEACON_TOKEN }));
     document.body.appendChild(script);
+  }
+
+  function loadGoogleAnalytics() {
+    if (window.__usSalaryToolsGA) return;
+    window.__usSalaryToolsGA = true;
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', GA_MEASUREMENT_ID);
+
+    if (!document.querySelector('script[data-us-salary-tools-ga]')) {
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_MEASUREMENT_ID);
+      script.setAttribute('data-us-salary-tools-ga', 'true');
+      document.head.appendChild(script);
+    }
+  }
+
+  function loadAnalytics() {
+    loadCloudflareAnalytics();
+    loadGoogleAnalytics();
   }
 
   function initCookieBanner() {
