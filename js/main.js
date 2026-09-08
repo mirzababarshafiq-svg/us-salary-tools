@@ -18,8 +18,6 @@
     document.documentElement.setAttribute('data-theme', theme);
   }
 
-  // Apply as early as possible (script runs at end of body, after DOM parse)
-  // to minimize the flash of the wrong theme.
   applyTheme(getPreferredTheme());
 
   function initThemeToggle() {
@@ -86,7 +84,7 @@
     try { saved = localStorage.getItem(CONSENT_KEY); } catch (e) {}
 
     if (saved === 'accepted') {
-      loadAnalytics();
+      loadCloudflareAnalytics();
     } else if (saved !== 'declined') {
       banner.setAttribute('data-visible', 'true');
     }
@@ -96,7 +94,7 @@
         var choice = btn.getAttribute('data-consent');
         try { localStorage.setItem(CONSENT_KEY, choice); } catch (e) {}
         banner.setAttribute('data-visible', 'false');
-        if (choice === 'accepted') loadAnalytics();
+        if (choice === 'accepted') loadCloudflareAnalytics();
       });
     });
   }
@@ -104,6 +102,8 @@
   function initNav() {
     initCookieBanner();
     initThemeToggle();
+    loadGoogleAnalytics();
+
     var dropdowns = document.querySelectorAll('.nav-dropdown');
     dropdowns.forEach(function (dropdown) {
       var trigger = dropdown.querySelector('.nav-dropdown__trigger');
