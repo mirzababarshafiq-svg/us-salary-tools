@@ -40,9 +40,9 @@ a { color: inherit; }
   --color-blue: #2F6BFF;
   --color-blue-ink: #1F4FCC;
   --color-blue-soft: #EEF4FF;
-  --color-gold: #B87F26;
+  --color-gold: #C3922A;
   --color-gold-ink: #8A5A14;
-  --color-gold-soft: #F7EED8;
+  --color-gold-soft: #F6E4B8;
   --color-green: #0B7F5E;
   --color-green-soft: #E6F8F0;
   --color-error: #B3261E;
@@ -171,9 +171,9 @@ section { padding: var(--sp-7) 0; }
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-gold-ink);
-  background: var(--color-gold-soft);
-  border: 1px solid rgba(184, 127, 38, 0.35);
+  color: #0E1526;
+  background: var(--color-gold);
+  border: 1px solid rgba(139, 90, 20, 0.35);
   border-radius: 999px;
   padding: 5px 12px;
   margin-bottom: var(--sp-3);
