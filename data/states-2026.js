@@ -1492,13 +1492,13 @@ export const STATES_2026 = {
     personalExemption: {},
     conformity: {"pretax401k": true, "pretaxHSA": true, "notes": ""},
     localTax: {"exists": false, "modeled": false, "note": "Local/city/county income taxes not included - see methodology"},
-    employeePayrollTaxes: [{"name": "WA PFML", "rate": 0.0071, "wageBase": 184500, "appliesTo": "grossWages", "source": "WA ESD PFML 1.13% total employee ~0.71%", "confidence": "verified"}, {"name": "WA Cares", "rate": 0.0058, "wageBase": null, "appliesTo": "grossWages", "source": "WA Cares 0.58% no cap", "confidence": "verified"}],
+    employeePayrollTaxes: [{"name": "WA PFML", "rate": 0.00807159, "wageBase": 184500, "appliesTo": "grossWages", "source": "WA ESD 2026 PFML 1.13% total; employee share 71.43% (=0.807159%); paidleave.wa.gov/updates", "confidence": "verified"}, {"name": "WA Cares", "rate": 0.0058, "wageBase": null, "appliesTo": "grossWages", "source": "WA Cares 0.58% no cap; paidleave.wa.gov", "confidence": "verified"}],
     addOnTaxes: [],
     source: "Tax Foundation 2026, State DOR",
     sourceUrl: "https://taxfoundation.org/data/all/state/state-income-tax-rates-2026/",
-    lastVerified: "2026-05-13",
+    lastVerified: "2026-09-20",
     confidence: "verified",
-    notes: ""
+    notes: "No wage income tax in 2026. ESSB 6346 9.9% on income above $1M starts 2028 and is not applied here."
   },
   "WV": {
     name: "West Virginia",
